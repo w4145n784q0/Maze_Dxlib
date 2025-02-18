@@ -85,25 +85,25 @@ Stage::Stage()
 {
 	stageData = vector(STAGE_HEIGHT, vector<STAGE_OBJ>(STAGE_WIDTH, STAGE_OBJ::EMPTY));
 
-	MakeMazeDigDug(STAGE_WIDTH, STAGE_HEIGHT, stageData);
-	//for (int y = 0; y < STAGE_HEIGHT; y++)
-	//{
-	//	for (int x = 0; x < STAGE_WIDTH; x++)
-	//	{
-	//		if (y == 0 || y == STAGE_HEIGHT - 1 || x == 0 || x == STAGE_WIDTH - 1)
-	//		{
-	//			stageData[y][x] = STAGE_OBJ::WALL;
-	//		}
-	//		else
-	//		{
-	//			if (x % 2 == 0 && y % 2 == 0)
-	//				stageData[y][x] = STAGE_OBJ::WALL;
-	//			else
-	//				stageData[y][x] = STAGE_OBJ::EMPTY;
-	//		}
+	//MakeMazeDigDug(STAGE_WIDTH, STAGE_HEIGHT, stageData);
+	for (int y = 0; y < STAGE_HEIGHT; y++)
+	{
+		for (int x = 0; x < STAGE_WIDTH; x++)
+		{
+			if (y == 0 || y == STAGE_HEIGHT - 1 || x == 0 || x == STAGE_WIDTH - 1)
+			{
+				stageData[y][x] = STAGE_OBJ::WALL;
+			}
+			else
+			{
+				if (x % 2 == 0 && y % 2 == 0)
+					stageData[y][x] = STAGE_OBJ::WALL;
+				else
+					stageData[y][x] = STAGE_OBJ::EMPTY;
+			}
 
-	//	}
-	//}
+		}
+	}
 	setStageRects();
 }
 

@@ -35,7 +35,7 @@ void Enemy::Update()
 	if (!stop) {
 		Point op = pos_;
 		Point move = { nDir[forward_].x, nDir[forward_].y };
-		Rect eRect = { pos_.x, pos_.y,CHA_WIDTH, CHA_HEIGHT };
+		Rect eRect = { pos_.x, pos_.y,CHA_WIDTH, CHA_HEIGHT };//敵の位置（Rect型）
 		Stage* stage = (Stage*)FindGameObject<Stage>();
 		pos_ = { pos_.x + move.x, pos_.y + move.y };
 		for (auto& obj : stage->GetStageRects())
@@ -44,15 +44,15 @@ void Enemy::Update()
 				Rect tmpRectX = { op.x, pos_.y, CHA_WIDTH, CHA_HEIGHT };
 				Rect tmpRecty = { pos_.x, op.y, CHA_WIDTH, CHA_HEIGHT };
 				if (!CheckHit(tmpRectX, obj))
-				{
+				{//x座標を元に戻したらぶつかっていない→x座標だけ元に戻す
 					pos_.x = op.x;
 				}
 				else if (!CheckHit(tmpRecty, obj))
-				{
+				{//y座標を元に戻したらぶつかっていない→y座標だけ元に戻す
 					pos_.y = op.y;
 				}
 				else
-				{
+				{//片方だけ戻してもやっぱりぶつかっている→両方元に戻す
 					pos_ = op;
 				}
 				//forward_ = (DIR)(GetRand(3));
@@ -71,9 +71,24 @@ void Enemy::Update()
 		//ここに動きのパターンを入れる
 		//YCloserMove();
 		//XYCloserMoveRandom();
-		RightHandMove();
+		//RightHandMove();
+		
+		YCloserMove();
 	}
+}
 
+void Enemy::Draw()
+{
+	DrawBox(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, 
+		GetColor(80, 89, 10), TRUE);
+	Point tp[4][3] = {
+		{{pos_.x + CHA_WIDTH / 2, pos_.y}, {pos_.x, pos_.y + CHA_HEIGHT / 2}, {pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT / 2}},
+		{{pos_.x + CHA_WIDTH / 2, pos_.y + CHA_HEIGHT}, {pos_.x, pos_.y + CHA_HEIGHT / 2}, {pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT / 2}},
+		{{pos_.x            , pos_.y + CHA_HEIGHT / 2}, {pos_.x + CHA_WIDTH / 2, pos_.y}, {pos_.x + CHA_WIDTH/2, pos_.y  + CHA_HEIGHT}},
+		{{pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT / 2}, {pos_.x + CHA_WIDTH / 2, pos_.y}, {pos_.x + CHA_WIDTH/2, pos_.y + CHA_HEIGHT}}
+					};
+
+	DrawTriangle(tp[forward_][0].x, tp[forward_][0].y, tp[forward_][1].x, tp[forward_][1].y, tp[forward_][2].x, tp[forward_][2].y, GetColor(255,255,255), TRUE);
 }
 
 void Enemy::YCloserMove()
@@ -118,7 +133,7 @@ void Enemy::XYCloserMove()
 			forward_ = RIGHT;
 		}
 	}
-	else 
+	else
 	{
 		if (pos_.y > player->GetPos().y)
 		{
@@ -174,20 +189,6 @@ void Enemy::RightHandMove()
 	{
 		forward_ = myLeft[forward_];
 	}
-}
-
-void Enemy::Draw()
-{
-	DrawBox(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, 
-		GetColor(80, 89, 10), TRUE);
-	Point tp[4][3] = {
-		{{pos_.x + CHA_WIDTH / 2, pos_.y}, {pos_.x, pos_.y + CHA_HEIGHT / 2}, {pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT / 2}},
-		{{pos_.x + CHA_WIDTH / 2, pos_.y + CHA_HEIGHT}, {pos_.x, pos_.y + CHA_HEIGHT / 2}, {pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT / 2}},
-		{{pos_.x            , pos_.y + CHA_HEIGHT / 2}, {pos_.x + CHA_WIDTH / 2, pos_.y}, {pos_.x + CHA_WIDTH/2, pos_.y  + CHA_HEIGHT}},
-		{{pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT / 2}, {pos_.x + CHA_WIDTH / 2, pos_.y}, {pos_.x + CHA_WIDTH/2, pos_.y + CHA_HEIGHT}}
-					};
-
-	DrawTriangle(tp[forward_][0].x, tp[forward_][0].y, tp[forward_][1].x, tp[forward_][1].y, tp[forward_][2].x, tp[forward_][2].y, GetColor(255,255,255), TRUE);
 }
 
 bool Enemy::CheckHit(const Rect& me, const Rect& other)
