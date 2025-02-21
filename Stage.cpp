@@ -86,6 +86,8 @@ Stage::Stage()
 	stageData = vector(STAGE_HEIGHT, vector<STAGE_OBJ>(STAGE_WIDTH, STAGE_OBJ::EMPTY));
 
 	//MakeMazeDigDug(STAGE_WIDTH, STAGE_HEIGHT, stageData);
+
+	//ƒOƒŠƒbƒh
 	for (int y = 0; y < STAGE_HEIGHT; y++)
 	{
 		for (int x = 0; x < STAGE_WIDTH; x++)

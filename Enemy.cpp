@@ -69,11 +69,14 @@ void Enemy::Update()
 	{
 		//forward_ = (DIR)(GetRand(3));
 		//‚±‚±‚É“®‚«‚Ìƒpƒ^[ƒ“‚ğ“ü‚ê‚é
+
+		//XCloserMove();
 		//YCloserMove();
+		XYCloserMove();
 		//XYCloserMoveRandom();
 		//RightHandMove();
-		
-		YCloserMove();
+
+
 	}
 }
 

@@ -18,11 +18,30 @@ public:
     void Update() override;
     void Draw() override;
     bool CheckHit(const Rect& me, const Rect& other);
+
+    /// <summary>
+    /// Y•ûŒü‚¾‚¯’Ç‚¢‚©‚¯‚é
+    /// </summary>
     void YCloserMove();
+
+    /// <summary>
+    /// X•ûŒü‚¾‚¯’Ç‚¢‚©‚¯‚é
+    /// </summary>
     void XCloserMove();
+
+    /// <summary>
+    /// XY‚Æ‚à‚É’Ç‚¢‚©‚¯‚é
+    /// </summary>
     void XYCloserMove();
+
+    /// <summary>
+    /// ƒ‰ƒ“ƒ_ƒ€‚Å’Ç‚¢‚©‚¯‚é
+    /// </summary>
     void XYCloserMoveRandom();
+
+    /// <summary>
+    /// ‰EŽè–@‚Å’Ç‚¢‚©‚¯‚é
+    /// </summary>
     void RightHandMove();
 
 };
-
