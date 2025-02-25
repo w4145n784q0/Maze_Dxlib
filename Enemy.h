@@ -10,7 +10,7 @@ private:
     enum Move
     {
         XYCLOSEMOVE = 0,
-        RIGHTMOVE = 1,
+        RIGHTHANDMOVE = 1,
     };
     Move ChoiceMove;
 
@@ -57,7 +57,5 @@ public:
     /// <summary>
     /// 
     /// </summary>
-    void SetRandomMove();
-
-    void SetMove(Move _move){if(_move == RIGHTMOVE)  }
+    void SetMove();
 };

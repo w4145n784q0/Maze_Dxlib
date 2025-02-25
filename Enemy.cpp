@@ -11,7 +11,7 @@ namespace
 }
 
 Enemy::Enemy()
-	:pos_({ 0,0 }), isAlive_(true), nextPos_({ 0,0 }),RandTimer_(0)
+	:pos_({ 0,0 }), isAlive_(true), nextPos_({ 0,0 }),RandTimer_(0),ChoiceMove(XYCLOSEMOVE)
 {
 	int rx = 0;
 	int ry = 0;
@@ -68,7 +68,36 @@ void Enemy::Update()
 	int cy = (pos_.y / (CHA_HEIGHT))%2;
 	if (prgssx == 0 && prgssy == 0 && cx && cy)
 	{
-
+		//300フレーム(5s)ごとに抽選
+		if (++RandTimer_ >= 300)
+		{
+			RandTimer_ = 0;
+			int i = GetRand(1);
+			if (i == 0)
+			{
+				XYCloserMoveRandom();
+				ChoiceMove = XYCLOSEMOVE;
+			}
+			else if (i == 1)
+			{
+				RightHandMove();
+				ChoiceMove = RIGHTHANDMOVE;
+			}
+		}
+		else
+		{
+			switch (ChoiceMove)
+			{
+			case Enemy::XYCLOSEMOVE:
+				XYCloserMoveRandom();
+				break;
+			case Enemy::RIGHTHANDMOVE:
+				RightHandMove();
+				break;
+			default:
+				break;
+			}
+		}
 		
 		//forward_ = (DIR)(GetRand(3));
 		//ここに動きのパターンを入れる
@@ -76,7 +105,7 @@ void Enemy::Update()
 		//XCloserMove();
 		//YCloserMove();
 		//XYCloserMove();
-		XYCloserMoveRandom();
+		//XYCloserMoveRandom();
 		//RightHandMove();
 
 
@@ -197,33 +226,9 @@ void Enemy::RightHandMove()
 	}
 }
 
-void Enemy::SetRandomMove()
+void Enemy::SetMove()
 {
-	if (++RandTimer_ <= 600)
-	{
-		RandTimer_ = 0;
-		int i = rand() % 2;
-		if (i == 0)
-		{
-			XYCloserMoveRandom();
-			ChoiceMove = XYCLOSEMOVE;
-		}
-		else if (i == 1)
-		{
-			RightHandMove();
-			ChoiceMove = RIGHTMOVE;
-		}
 
-	}
-	else
-	{
-		if (ChoiceMove == XYCLOSEMOVE)
-			XYCloserMoveRandom();
-		else if (ChoiceMove == RIGHTMOVE)
-			RightHandMove();
-		else
-			XYCloserMove();
-	}
 }
 
 bool Enemy::CheckHit(const Rect& me, const Rect& other)
