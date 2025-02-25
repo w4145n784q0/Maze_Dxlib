@@ -6,11 +6,21 @@
 class Enemy :
     public GameObject
 {
+private:
+    enum Move
+    {
+        XYCLOSEMOVE = 0,
+        RIGHTMOVE = 1,
+    };
+    Move ChoiceMove;
+
     Point pos_;
     bool isAlive_;
     float speed_;
     Point nextPos_;
     DIR forward_;
+
+    int RandTimer_;
 public:
     Enemy();
     ~Enemy();
@@ -44,4 +54,10 @@ public:
     /// </summary>
     void RightHandMove();
 
+    /// <summary>
+    /// 
+    /// </summary>
+    void SetRandomMove();
+
+    void SetMove(Move _move){if(_move == RIGHTMOVE)  }
 };

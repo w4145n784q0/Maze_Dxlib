@@ -7,10 +7,11 @@
 namespace
 {
 	Point nDir[4] = { {0,-1},{0,1},{-1,0},{1,0} };
+	const int ChangeTimer = 600;
 }
 
 Enemy::Enemy()
-	:pos_({ 0,0 }), isAlive_(true), nextPos_({ 0,0 })
+	:pos_({ 0,0 }), isAlive_(true), nextPos_({ 0,0 }),RandTimer_(0)
 {
 	int rx = 0;
 	int ry = 0;
@@ -67,13 +68,15 @@ void Enemy::Update()
 	int cy = (pos_.y / (CHA_HEIGHT))%2;
 	if (prgssx == 0 && prgssy == 0 && cx && cy)
 	{
+
+		
 		//forward_ = (DIR)(GetRand(3));
 		//Ç±Ç±Ç…ìÆÇ´ÇÃÉpÉ^Å[ÉìÇì¸ÇÍÇÈ
 
 		//XCloserMove();
 		//YCloserMove();
-		XYCloserMove();
-		//XYCloserMoveRandom();
+		//XYCloserMove();
+		XYCloserMoveRandom();
 		//RightHandMove();
 
 
@@ -191,6 +194,35 @@ void Enemy::RightHandMove()
 	else if (isRightOpen == false && isForwardOpen == false)
 	{
 		forward_ = myLeft[forward_];
+	}
+}
+
+void Enemy::SetRandomMove()
+{
+	if (++RandTimer_ <= 600)
+	{
+		RandTimer_ = 0;
+		int i = rand() % 2;
+		if (i == 0)
+		{
+			XYCloserMoveRandom();
+			ChoiceMove = XYCLOSEMOVE;
+		}
+		else if (i == 1)
+		{
+			RightHandMove();
+			ChoiceMove = RIGHTMOVE;
+		}
+
+	}
+	else
+	{
+		if (ChoiceMove == XYCLOSEMOVE)
+			XYCloserMoveRandom();
+		else if (ChoiceMove == RIGHTMOVE)
+			RightHandMove();
+		else
+			XYCloserMove();
 	}
 }
 
