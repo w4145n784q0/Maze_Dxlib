@@ -3,6 +3,7 @@
 #include "globals.h"
 #include "Player.h"
 #include <map>
+#include "./Source/Input.h"
 
 namespace
 {
@@ -38,6 +39,12 @@ void Enemy::Update()
 		Point move = { nDir[forward_].x, nDir[forward_].y };
 		Rect eRect = { pos_.x, pos_.y,CHA_WIDTH, CHA_HEIGHT };//敵の位置（Rect型）
 		Stage* stage = (Stage*)FindGameObject<Stage>();
+
+		if (Input::IsKeepKeyDown(KEY_INPUT_SPACE))
+		{
+			move = { 0,0 };
+		}
+
 		pos_ = { pos_.x + move.x, pos_.y + move.y };
 		for (auto& obj : stage->GetStageRects())
 		{
@@ -69,7 +76,7 @@ void Enemy::Update()
 	if (prgssx == 0 && prgssy == 0 && cx && cy)
 	{
 		//300フレーム(5s)ごとに抽選
-		if (++RandTimer_ >= 300)
+		/*if (++RandTimer_ >= 300)
 		{
 			RandTimer_ = 0;
 			int i = GetRand(1);
@@ -97,7 +104,7 @@ void Enemy::Update()
 			default:
 				break;
 			}
-		}
+		}*/
 		
 		//forward_ = (DIR)(GetRand(3));
 		//ここに動きのパターンを入れる
@@ -106,7 +113,7 @@ void Enemy::Update()
 		//YCloserMove();
 		//XYCloserMove();
 		//XYCloserMoveRandom();
-		//RightHandMove();
+		RightHandMove();
 
 
 	}

@@ -36,6 +36,12 @@
 		NONE,
 		MAXDIR
 	};
+
+	struct Vec2
+	{
+		double x;
+		double y;
+	};
 	
 	const int CHA_WIDTH = 32;
 	const int CHA_HEIGHT = 32;

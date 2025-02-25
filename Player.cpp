@@ -51,6 +51,7 @@ void Player::Update()
 		pos_.x++;
 		inputDir = RIGHT;
 	}
+	
 
 	Stage* stage = (Stage*)FindGameObject<Stage>();
 	Rect playerRect = { pos_.x, pos_.y, CHA_WIDTH, CHA_HEIGHT };

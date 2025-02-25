@@ -7,8 +7,13 @@
 #include "./Source/Screen.h"
 #include "./globals.h"
 
-using std::vector;
 
+using std::vector;
+using std::pair;
+using Vec2Int = std::pair<int, int>;//intŒ^‚Q‚Â‚ÌƒyƒA
+using Mdat = std::pair<int, Vec2Int>;//
+
+const Vec2 dirs[4]{ {0,1},{0,-1},{1,0},{-1,0} };
 
 constexpr int STAGE_WIDTH = (Screen::WIDTH / CHA_WIDTH) % 2 ? (Screen::WIDTH / CHA_WIDTH) : (Screen::WIDTH / CHA_WIDTH) - 1;
 constexpr int STAGE_HEIGHT = (Screen::HEIGHT / CHA_HEIGHT) % 2 ? (Screen::HEIGHT / CHA_HEIGHT) : (Screen::HEIGHT / CHA_HEIGHT) - 1;
@@ -28,5 +33,7 @@ public:
 	vector<Rect> GetStageRects() { return stageRects; }
 	vector<vector<STAGE_OBJ>>& GetStageGrid() { return stageData; }
 	void setStageRects();
+
+	void Dijkstra(pair<int, int> sp);
 };
 
