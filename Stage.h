@@ -30,6 +30,9 @@ const Vec2 dirs[4]{ {0,1},{0,-1},{1,0},{-1,0} };
 constexpr int STAGE_WIDTH = (Screen::WIDTH / CHA_WIDTH) % 2 ? (Screen::WIDTH / CHA_WIDTH) : (Screen::WIDTH / CHA_WIDTH) - 1;
 constexpr int STAGE_HEIGHT = (Screen::HEIGHT / CHA_HEIGHT) % 2 ? (Screen::HEIGHT / CHA_HEIGHT) : (Screen::HEIGHT / CHA_HEIGHT) - 1;
 
+const Point START_POINT{ 1,1 };
+const Point GOAL_POINT{ STAGE_WIDTH - 2,STAGE_HEIGHT - 2 };
+
 //ダイクストラ法用
 	//ステージの一ブロックごとのタイプとウェイトを保存
 struct floorData
@@ -53,6 +56,18 @@ public:
 	vector<vector<STAGE_OBJ>>& GetStageGrid() { return stageData; }
 	void setStageRects();
 
+	/// <summary>
+	/// ダイクストラ法の全探索
+	/// </summary>
+	/// <param name="sp">全探索の始点</param>
 	void Dijkstra(pair<int, int> sp);
+
+	/// <summary>
+	/// 経路の逆追跡
+	/// </summary>
+	/// <param name="_x">逆追跡を始める位置のx座標</param>
+	/// <param name="_y">逆追跡を始める位置のy座標</param>
+	/// <returns>探索した経路の配列</returns>
+	std::vector<Vec2> restore(int _x, int _y);
 };
 

@@ -202,6 +202,8 @@ Stage::Stage()
 	Dijkstra({ 1,1 });
 	a = dist;
 
+	std::vector<Vec2> route = restore(GOAL_POINT.x, GOAL_POINT.y );//経路を逆追跡
+
 }
 
 Stage::~Stage()
@@ -251,10 +253,7 @@ void Stage::setStageRects()
 	}
 }
 
-/// <summary>
-/// ダイクストラ法の全探索
-/// </summary>
-/// <param name="sp">全探索の始点</param>
+
 void Stage::Dijkstra(pair<int, int> sp)
 {
 	//dist[1(y)][1(x)]をコストを0で初期化
@@ -306,4 +305,21 @@ void Stage::Dijkstra(pair<int, int> sp)
 		}
 	}
 
+}
+
+std::vector<Vec2> Stage::restore(int _x, int _y)
+{
+	std::vector<Vec2> path;
+	int x = _x, y = _y;
+	//_x,_yが-1にならない限り継続 ループ終了後_x = prev[y][x].x , _y = prev[y][x].yを代入
+	for (; _x != -1 || _y != -1; _x = prev[y][x].x, _y = prev[y][x].y) {
+
+		//pathに追跡前の位置を保管
+		path.push_back(Vec2{ (double)_x, (double)_y });
+
+		//x,yの更新
+		x = (int)_x, y = (int)_y;
+	}
+	reverse(path.begin(), path.end());
+	return path;
 }
