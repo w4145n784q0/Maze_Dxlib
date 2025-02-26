@@ -4,8 +4,14 @@
 #include<queue>
 #include<concurrent_priority_queue.h>
 
+using std::vector;
+
 namespace {
 	std::stack<Point> prStack;
+
+	
+	//二次元配列　MazeData[MazeSize.y][MazeSize.x]{FLOORで初期化｝
+	std::vector<std::vector<floorData>> MazeDataDijkstra(STAGE_HEIGHT, std::vector<floorData>(STAGE_WIDTH, { STAGE_OBJ::EMPTY, 0 })); //迷路そのもの
 
 	//ダイクストラ法のコスト保存用
 	//distの要素数は[0]~[20](21個),それぞれが39個のINT_MAXを持つ
@@ -92,13 +98,20 @@ namespace {
 			DigDug(sp.x, sp.y, _stage);
 		}
 
-		//外壁を埋める
+		//外壁を埋める+重み付け
 		for (int j = 0; j < h; j++)
 		{
 			for (int i = 0; i < w; i++)
 			{
 				if (i == 0 || j == 0 || i == w - 1 || j == h - 1)
+				{
 					_stage[j][i] = STAGE_OBJ::WALL;
+				}
+				else
+				{
+					MazeDataDijkstra[j][i].weight = (rand() % 5) + 1;
+				}
+
 				continue;
 			}
 		}
@@ -184,6 +197,11 @@ Stage::Stage()
 		}
 	}*/
 	setStageRects();
+
+	std::vector<std::vector<int>> a;
+	Dijkstra({ 1,1 });
+	a = dist;
+
 }
 
 Stage::~Stage()
@@ -192,6 +210,7 @@ Stage::~Stage()
 
 void Stage::Update()
 {
+
 }
 
 void Stage::Draw()
@@ -230,13 +249,21 @@ void Stage::setStageRects()
 			}
 		}
 	}
-
 }
 
+/// <summary>
+/// ダイクストラ法の全探索
+/// </summary>
+/// <param name="sp">全探索の始点</param>
 void Stage::Dijkstra(pair<int, int> sp)
 {
-	dist[sp.second][sp.first] = 0;//スタートのy,x
+	//dist[1(y)][1(x)]をコストを0で初期化
+	dist[sp.second][sp.first] = 0;
+
+	//Mdat型、Mdat型コンテナ、昇順
 	std::priority_queue<Mdat, std::vector<Mdat>, std::greater<Mdat>> pq;
+
+	//コスト0,座標1,1で初期化
 	pq.push(Mdat(0, { sp.first, sp.second }));
 
 	while (!pq.empty())
@@ -245,25 +272,36 @@ void Stage::Dijkstra(pair<int, int> sp)
 		pq.pop();
 
 		//Rect{ (int)p.second.first * CHA_WIDTH, (int)p.second.second * CHA_HEIGHT, BLOCK_SIZE }.draw(Palette::Red);
-		int c = p.first;
+		
+		//最短距離を保管
+		int cost = p.first;
+
+		//現在値を保管
 		Vec2Int v = p.second;
 
 		for (int i = 0; i < 4; i++)
 		{
-			//方向を一個ずつ確認
+			//探索方向　dirs[0]~[3]から一個ずつ確認
+			//first : 探索先のx方向
+			//second : 探索先のy方向
 			Vec2Int np = { v.first + (int)dirs[i].x, v.second + (int)dirs[i].y };
 
 			//0かグリッドを超える探索はしない
-			if (np.first < 0 || np.second < 0 || np.first >= MazeSize.x || np.second >= MazeSize.y) continue;
+			if (np.first < 0 || np.second < 0 || np.first >= STAGE_WIDTH || np.second >= STAGE_HEIGHT) continue;
 
 			//壁なら探索しない
-			if (MazeData[np.second][np.first].type == WALL) continue;
+			if (stageData[np.second][np.first] == STAGE_OBJ::WALL) continue;
 
-			//
-			if (dist[np.second][np.first] <= MazeData[np.second][np.first].weight + c) continue;
+			//探索する方向よりコストが大きいならスルー
+			if (dist[np.second][np.first] <= MazeDataDijkstra[np.second][np.first].weight + cost) continue;
 
-			dist[np.second][np.first] = MazeData[np.second][np.first].weight + c;
-			pre[np.second][np.first] = Vec2(v.first, v.second);
+			//最短距離を更新
+			dist[np.second][np.first] = MazeDataDijkstra[np.second][np.first].weight + cost;
+
+			//辿った経路を保存
+			prev[np.second][np.first] = Vec2{(double)v.first, (double)v.second };
+
+			//今のコストと探索方向の座標を保存
 			pq.push(Mdat(dist[np.second][np.first], np));
 		}
 	}
