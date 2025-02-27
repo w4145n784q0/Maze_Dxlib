@@ -46,6 +46,7 @@ class Stage :
 {
 	vector<vector<STAGE_OBJ>> stageData;
 	vector<Rect> stageRects;
+	std::vector<Vec2> route;
 public:
 	Stage();
 	~Stage();

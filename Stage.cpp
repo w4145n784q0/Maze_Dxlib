@@ -203,7 +203,7 @@ Stage::Stage()
 	std::vector<std::vector<int>> a;
 	//Dijkstra({ 1,1 });
 
-	std::vector<Vec2> route = restore(GOAL_POINT.x, GOAL_POINT.y );//åoòHÇãtí«ê’
+    //route = restore(GOAL_POINT.x, GOAL_POINT.y );//åoòHÇãtí«ê’
 
 }
 
@@ -244,6 +244,11 @@ void Stage::Draw()
 			}
 		}
 	}
+
+	/*for (auto itr : route)
+	{
+		DrawBox(itr.x * CHA_WIDTH, itr.y * CHA_HEIGHT, itr.x * CHA_WIDTH + CHA_WIDTH, itr.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(255, 255, 0), FALSE);
+	}*/
 }
 
 void Stage::setStageRects()

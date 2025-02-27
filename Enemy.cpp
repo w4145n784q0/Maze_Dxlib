@@ -25,9 +25,35 @@ Enemy::Enemy()
 	pos_ = { rx * CHA_WIDTH, ry * CHA_HEIGHT };
 	forward_ = RIGHT;
 
-	//Stage* stage = (Stage*)FindGameObject<Stage>();
-	//Player* player = (Player*)FindGameObject<Player>();
-	//Point tmp = player->GetGridPos();
+	Stage* stage = (Stage*)FindGameObject<Stage>();
+	Player* player = (Player*)FindGameObject<Player>();
+
+	//初期位置が壁なら戻す
+	Rect eRect = { pos_.x, pos_.y,CHA_WIDTH, CHA_HEIGHT };//敵の位置（Rect型）
+	for (auto& obj : stage->GetStageRects())
+	{
+		Point op = pos_;
+		if (CheckHit(eRect, obj)) {
+			Rect tmpRectX = { op.x, pos_.y, CHA_WIDTH, CHA_HEIGHT };
+			Rect tmpRecty = { pos_.x, op.y, CHA_WIDTH, CHA_HEIGHT };
+			if (!CheckHit(tmpRectX, obj))
+			{//x座標を元に戻したらぶつかっていない→x座標だけ元に戻す
+				pos_.x = op.x;
+			}
+			else if (!CheckHit(tmpRecty, obj))
+			{//y座標を元に戻したらぶつかっていない→y座標だけ元に戻す
+				pos_.y = op.y;
+			}
+			else
+			{//片方だけ戻してもやっぱりぶつかっている→両方元に戻す
+				pos_ = op;
+			}
+		}
+	}
+
+	Point tmp = player->GetGridPos();
+	stage->Dijkstra({ (pos_.x / 32), (pos_.y / 32) });
+	tmpRoute = stage->restore(tmp.x, tmp.y);
 }
 
 Enemy::~Enemy()
@@ -36,6 +62,8 @@ Enemy::~Enemy()
 
 void Enemy::Update()
 {
+	Stage* stage = (Stage*)FindGameObject<Stage>();
+	Player* player = (Player*)FindGameObject<Player>();
 	static bool stop = false;
 
 	if (!stop) {
@@ -43,15 +71,11 @@ void Enemy::Update()
 		Point move = { nDir[forward_].x, nDir[forward_].y };
 		Rect eRect = { pos_.x, pos_.y,CHA_WIDTH, CHA_HEIGHT };//敵の位置（Rect型）
 
-		Stage* stage = (Stage*)FindGameObject<Stage>();
-		Player* player = (Player*)FindGameObject<Player>();
-		Point tmp = player->GetGridPos();
-		stage->Dijkstra({ tmp.x,tmp.y });
 
-		if (Input::IsKeepKeyDown(KEY_INPUT_SPACE))
-		{
+		//if (Input::IsKeepKeyDown(KEY_INPUT_SPACE))
+		//{
 			move = { 0,0 };
-		}
+		//}
 		
 		pos_ = { pos_.x + move.x, pos_.y + move.y };
 		for (auto& obj : stage->GetStageRects())
@@ -119,12 +143,17 @@ void Enemy::Update()
 
 		//XCloserMove();
 		//YCloserMove();
-		XYCloserMove();
+		//XYCloserMove();
 		//XYCloserMoveRandom();
-		//RightHandMove();
+		RightHandMove();
 
 
 	}
+
+	//Point tmp = player->GetGridPos();
+	//stage->Dijkstra({ (pos_.x / 32), (pos_.y / 32) });
+	//tmpRoute = stage->restore(tmp.x, tmp.y);
+
 }
 
 void Enemy::Draw()
@@ -139,6 +168,11 @@ void Enemy::Draw()
 					};
 
 	DrawTriangle(tp[forward_][0].x, tp[forward_][0].y, tp[forward_][1].x, tp[forward_][1].y, tp[forward_][2].x, tp[forward_][2].y, GetColor(255,255,255), TRUE);
+
+	for (auto itr : tmpRoute)
+	{
+		DrawBox(itr.x * CHA_WIDTH, itr.y * CHA_HEIGHT, itr.x * CHA_WIDTH + CHA_WIDTH, itr.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(255, 255, 0), FALSE);
+	}
 }
 
 void Enemy::YCloserMove()
@@ -241,9 +275,13 @@ void Enemy::RightHandMove()
 	}
 }
 
-void Enemy::SetMove()
+void Enemy::DijkstraMove()
 {
 
+}
+
+void Enemy::EnemyBackEmpty()
+{
 }
 
 bool Enemy::CheckHit(const Rect& me, const Rect& other)

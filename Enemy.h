@@ -1,6 +1,7 @@
 #pragma once
 #include "./Library/GameObject.h"
 #include "./globals.h"
+#include<vector>
 
 
 class Enemy :
@@ -16,11 +17,12 @@ private:
 
     Point pos_;
     bool isAlive_;
-    float speed_;
+    //float speed_;
     Point nextPos_;
     DIR forward_;
 
     int RandTimer_;
+    std::vector<Vec2> tmpRoute;
 public:
     Enemy();
     ~Enemy();
@@ -55,7 +57,9 @@ public:
     void RightHandMove();
 
     /// <summary>
-    /// 
+    /// ダイクストラ法で追いかける
     /// </summary>
-    void SetMove();
+    void DijkstraMove();
+
+    void EnemyBackEmpty();
 };
