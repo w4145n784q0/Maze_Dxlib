@@ -70,4 +70,3 @@ public:
 	/// <returns>’Tõ‚µ‚½Œo˜H‚Ì”z—ñ</returns>
 	std::vector<Vec2> restore(int _x, int _y);
 };
-

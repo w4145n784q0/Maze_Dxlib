@@ -3,6 +3,7 @@
 #include <stack>
 #include<queue>
 #include<concurrent_priority_queue.h>
+#include<string>
 
 using std::vector;
 
@@ -109,7 +110,8 @@ namespace {
 				}
 				else
 				{
-					MazeDataDijkstra[j][i].weight = (rand() % 5) + 1;
+					//MazeDataDijkstra[j][i].weight = (rand() % 5) + 1;
+					MazeDataDijkstra[j][i].weight = 1;
 				}
 
 				continue;
@@ -199,8 +201,7 @@ Stage::Stage()
 	setStageRects();
 
 	std::vector<std::vector<int>> a;
-	Dijkstra({ 1,1 });
-	a = dist;
+	//Dijkstra({ 1,1 });
 
 	std::vector<Vec2> route = restore(GOAL_POINT.x, GOAL_POINT.y );//åoòHÇãtí«ê’
 
@@ -230,10 +231,16 @@ void Stage::Draw()
 				DrawBox(x * CHA_WIDTH, y * CHA_HEIGHT, x * CHA_WIDTH + CHA_WIDTH, y * CHA_HEIGHT + CHA_HEIGHT, GetColor(119, 136, 153), TRUE);
 				break;
 			case STAGE_OBJ::GOAL:
-			
+				DrawBox(x * CHA_WIDTH, y * CHA_HEIGHT, x * CHA_WIDTH + CHA_WIDTH, y * CHA_HEIGHT + CHA_HEIGHT, GetColor(255, 255, 255), TRUE);
 				break;
 			default:
 				break;
+			}
+			if (dist[y][x] < INT_MAX)
+			{
+				std::string s = std::to_string(dist[y][x]);
+				const char* c = s.c_str();
+				DrawFormatString(x * CHA_WIDTH, y * CHA_HEIGHT,GetColor(0,0,255), "%s", c);
 			}
 		}
 	}

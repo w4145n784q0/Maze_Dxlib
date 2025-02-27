@@ -24,6 +24,10 @@ Enemy::Enemy()
 
 	pos_ = { rx * CHA_WIDTH, ry * CHA_HEIGHT };
 	forward_ = RIGHT;
+
+	//Stage* stage = (Stage*)FindGameObject<Stage>();
+	//Player* player = (Player*)FindGameObject<Player>();
+	//Point tmp = player->GetGridPos();
 }
 
 Enemy::~Enemy()
@@ -38,13 +42,17 @@ void Enemy::Update()
 		Point op = pos_;
 		Point move = { nDir[forward_].x, nDir[forward_].y };
 		Rect eRect = { pos_.x, pos_.y,CHA_WIDTH, CHA_HEIGHT };//ìGÇÃà íuÅiRectå^Åj
+
 		Stage* stage = (Stage*)FindGameObject<Stage>();
+		Player* player = (Player*)FindGameObject<Player>();
+		Point tmp = player->GetGridPos();
+		stage->Dijkstra({ tmp.x,tmp.y });
 
 		if (Input::IsKeepKeyDown(KEY_INPUT_SPACE))
 		{
 			move = { 0,0 };
 		}
-
+		
 		pos_ = { pos_.x + move.x, pos_.y + move.y };
 		for (auto& obj : stage->GetStageRects())
 		{
@@ -111,9 +119,9 @@ void Enemy::Update()
 
 		//XCloserMove();
 		//YCloserMove();
-		//XYCloserMove();
+		XYCloserMove();
 		//XYCloserMoveRandom();
-		RightHandMove();
+		//RightHandMove();
 
 
 	}
