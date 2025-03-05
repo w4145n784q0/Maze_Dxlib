@@ -104,9 +104,9 @@ void Player::Update()
 
 void Player::Draw()
 {
-	ImGui::Begin("config 1");
+	//ImGui::Begin("config 1");
 
-	ImGui::End();
+	//ImGui::End();
 
 	DrawBox(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, GetColor(255, 10, 10), TRUE);
 }

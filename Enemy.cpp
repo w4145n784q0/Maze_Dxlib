@@ -3,6 +3,7 @@
 #include "globals.h"
 #include "Player.h"
 #include <map>
+#include "ImGui/imgui.h"
 
 namespace
 {
@@ -11,7 +12,8 @@ namespace
 }
 
 Enemy::Enemy()
-	:pos_({ 0,0 }), isAlive_(true), nextPos_({ 0,0 }),RandTimer_(0),ChoiceMove(XYCLOSEMOVE)
+	:pos_({ 0,0 }), isAlive_(true), nextPos_({ 0,0 }),RandTimer_(0),ChoiceMove(XYCLOSEMOVE),
+	IsRandom(false)
 {
 	int rx = 0;
 	int ry = 0;
@@ -69,36 +71,41 @@ void Enemy::Update()
 	if (prgssx == 0 && prgssy == 0 && cx && cy)
 	{
 		//300フレーム(5s)ごとに抽選
-		if (++RandTimer_ >= 300)
-		{
-			RandTimer_ = 0;
-			int i = GetRand(1);
-			if (i == 0)
+		if (IsRandom) {
+			if (++RandTimer_ >= 300)
 			{
-				XYCloserMoveRandom();
-				ChoiceMove = XYCLOSEMOVE;
+				RandTimer_ = 0;
+				int i = GetRand(1);
+				if (i == 0)
+				{
+					XYCloserMoveRandom();
+					ChoiceMove = XYCLOSEMOVE;
+				}
+				else if (i == 1)
+				{
+					RightHandMove();
+					ChoiceMove = RIGHTHANDMOVE;
+				}
 			}
-			else if (i == 1)
+			else
 			{
-				RightHandMove();
-				ChoiceMove = RIGHTHANDMOVE;
+				switch (ChoiceMove)
+				{
+				case Enemy::XYCLOSEMOVE:
+					XYCloserMoveRandom();
+					break;
+				case Enemy::RIGHTHANDMOVE:
+					RightHandMove();
+					break;
+				default:
+					break;
+				}
 			}
 		}
-		else
-		{
-			switch (ChoiceMove)
-			{
-			case Enemy::XYCLOSEMOVE:
-				XYCloserMoveRandom();
-				break;
-			case Enemy::RIGHTHANDMOVE:
-				RightHandMove();
-				break;
-			default:
-				break;
-			}
+		else {//ずっと自機追いかけ
+			XYCloserMove();
 		}
-		
+
 		//forward_ = (DIR)(GetRand(3));
 		//ここに動きのパターンを入れる
 
@@ -124,6 +131,13 @@ void Enemy::Draw()
 					};
 
 	DrawTriangle(tp[forward_][0].x, tp[forward_][0].y, tp[forward_][1].x, tp[forward_][1].y, tp[forward_][2].x, tp[forward_][2].y, GetColor(255,255,255), TRUE);
+
+	if (ImGui::Button("Random")) {
+		IsRandom = true;
+	}
+	if (ImGui::Button("xycloser")) {
+		IsRandom = false;
+	}
 }
 
 void Enemy::YCloserMove()

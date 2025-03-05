@@ -7,6 +7,7 @@ class Enemy :
     public GameObject
 {
 private:
+    bool IsRandom;
     enum Move
     {
         XYCLOSEMOVE = 0,
