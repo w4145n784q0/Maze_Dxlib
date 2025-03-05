@@ -4,6 +4,7 @@
 #include "Player.h"
 #include <map>
 #include "./Source/Input.h"
+#include "ImGui/imgui.h"
 
 namespace
 {
@@ -107,53 +108,11 @@ void Enemy::Update()
 	int cy = (pos_.y / (CHA_HEIGHT))%2;
 	if (prgssx == 0 && prgssy == 0 && cx && cy)
 	{
-		//300フレーム(5s)ごとに抽選
-		/*if (++RandTimer_ >= 300)
-		{
-			RandTimer_ = 0;
-			int i = GetRand(1);
-			if (i == 0)
-			{
-				XYCloserMoveRandom();
-				ChoiceMove = XYCLOSEMOVE;
-			}
-			else if (i == 1)
-			{
-				RightHandMove();
-				ChoiceMove = RIGHTHANDMOVE;
-			}
-		}
-		else
-		{
-			switch (ChoiceMove)
-			{
-			case Enemy::XYCLOSEMOVE:
-				XYCloserMoveRandom();
-				break;
-			case Enemy::RIGHTHANDMOVE:
-				RightHandMove();
-				break;
-			default:
-				break;
-			}
-		}*/
-		
-		//forward_ = (DIR)(GetRand(3));
-		//ここに動きのパターンを入れる
-
-		//XCloserMove();
-		//YCloserMove();
 		//XYCloserMove();
-		//XYCloserMoveRandom();
-		RightHandMove();
-
-
 	}
 
-	//Point tmp = player->GetGridPos();
-	//stage->Dijkstra({ (pos_.x / 32), (pos_.y / 32) });
-	//tmpRoute = stage->restore(tmp.x, tmp.y);
-
+	Point tmp = player->GetGridPos();
+	tmpRoute = stage->restore(tmp.x, tmp.y);
 }
 
 void Enemy::Draw()
@@ -277,7 +236,6 @@ void Enemy::RightHandMove()
 
 void Enemy::DijkstraMove()
 {
-
 }
 
 void Enemy::EnemyBackEmpty()
