@@ -71,5 +71,10 @@ public:
 	/// <returns>’Tõ‚µ‚½Œo˜H‚Ì”z—ñ</returns>
 	std::vector<Vec2> restore(int _x, int _y);
 
+	
+	void DijkstraRoute(pair<int, int> sp, int endX, int endY);
+
 	std::vector<std::vector<int>> GetDist();
+
+	
 };

@@ -5,11 +5,19 @@
 #include <map>
 #include "./Source/Input.h"
 #include "ImGui/imgui.h"
+#include <algorithm> 
 
 namespace
 {
+	//四方向(↓,↑,←,→)
 	Point nDir[4] = { {0,-1},{0,1},{-1,0},{1,0} };
+
+	//ランダム移動の切り替え時間
 	const int ChangeTimer = 600;
+
+	int temp = 1;
+
+	DIR dirlist[] = { UP,DOWN,LEFT,RIGHT };
 }
 
 Enemy::Enemy()
@@ -54,7 +62,11 @@ Enemy::Enemy()
 
 	Point tmp = player->GetGridPos();
 	stage->Dijkstra({ (pos_.x / 32), (pos_.y / 32) });
-	tmpRoute = stage->restore(tmp.x, tmp.y);
+	tmpRoute = stage->restore(tmp.x, tmp.y);//ルートを保存
+	stageDist = stage->GetDist();
+	Point a = player->GetGridPos();
+
+	EnemyGridPos = { pos_.x / 32, pos_.y / 32 };
 }
 
 Enemy::~Enemy()
@@ -66,6 +78,8 @@ void Enemy::Update()
 	Stage* stage = (Stage*)FindGameObject<Stage>();
 	Player* player = (Player*)FindGameObject<Player>();
 	static bool stop = false;
+
+	EnemyGridPos = { pos_.x / 32, pos_.y / 32 };
 
 	if (!stop) {
 		Point op = pos_;
@@ -108,11 +122,12 @@ void Enemy::Update()
 	int cy = (pos_.y / (CHA_HEIGHT))%2;
 	if (prgssx == 0 && prgssy == 0 && cx && cy)
 	{
-		RightHandMove();
+		DijkstraMove();
 	}
 
 	Point tmp = player->GetGridPos();
-	tmpRoute = stage->restore(tmp.x, tmp.y);
+	tmpRoute = stage->restore(tmp.x, tmp.y);//ゴールまでの道のりを保存
+	stageDist = stage->GetDist();//コストを保存
 }
 
 void Enemy::Draw()
@@ -135,7 +150,7 @@ void Enemy::Draw()
 
 	ImGui::Begin("config 1");
 	ImGui::Text("Size: %.2d", tmpRoute.size());
-	//ImGui::Text("route %.2d", tmpRoute[1].y);
+
 	ImGui::End();
 }
 
@@ -241,7 +256,8 @@ void Enemy::RightHandMove()
 
 void Enemy::DijkstraMove()
 {
-
+	Stage* stage = (Stage*)FindGameObject<Stage>();
+	forward_ = stage->DijkstraRoute({ (pos_.x / 32), (pos_.y / 32) });
 }
 
 bool Enemy::CheckHit(const Rect& me, const Rect& other)

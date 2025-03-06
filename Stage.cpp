@@ -14,7 +14,7 @@ namespace {
 	//二次元配列　MazeData[MazeSize.y][MazeSize.x]{FLOORで初期化｝
 	std::vector<std::vector<floorData>> MazeDataDijkstra(STAGE_HEIGHT, std::vector<floorData>(STAGE_WIDTH, { STAGE_OBJ::EMPTY, 0 })); //迷路そのもの
 
-	//ダイクストラ法のコスト保存用
+	//ダイクストラ法のコスト(到着までの移動量)保存用
 	//distの要素数は[0]~[20](21個),それぞれが39個のINT_MAXを持つ
 	//ダイクストラ法は始めに各値を無限大(INT_MAX)で初期化
 	std::vector<std::vector<int>> dist(STAGE_HEIGHT, std::vector<int>(STAGE_WIDTH, INT_MAX));
@@ -240,6 +240,7 @@ void Stage::Draw()
 			{
 				std::string s = std::to_string(dist[y][x]);
 				const char* c = s.c_str();
+				//ゴールまでのコストを表示
 				DrawFormatString(x * CHA_WIDTH, y * CHA_HEIGHT,GetColor(0,0,255), "%s", c);
 			}
 		}
@@ -334,6 +335,82 @@ std::vector<Vec2> Stage::restore(int _x, int _y)
 	}
 	reverse(path.begin(), path.end());
 	return path;
+}
+
+void Stage::DijkstraRoute(pair<int, int> sp, int endX,int endY)
+{
+	//dist[1(y)][1(x)]をコストを0で初期化
+	dist[sp.second][sp.first] = 0;
+
+	//Mdat型、Mdat型コンテナ、昇順
+	std::priority_queue<Mdat, std::vector<Mdat>, std::greater<Mdat>> pq;
+
+	//コスト0,座標1,1で初期化
+	pq.push(Mdat(0, { sp.first, sp.second }));
+
+	while (!pq.empty())
+	{
+		Mdat p = pq.top();
+		pq.pop();
+
+		//最短距離を保管
+		int cost = p.first;
+
+		//現在値を保管
+		Vec2Int v = p.second;
+
+		for (int i = 0; i < 4; i++)
+		{
+			//探索方向　dirs[0]~[3]から一個ずつ確認
+			//first : 探索先のx方向
+			//second : 探索先のy方向
+			Vec2Int np = { v.first + (int)dirs[i].x, v.second + (int)dirs[i].y };
+
+			//0かグリッドを超える探索はしない
+			if (np.first < 0 || np.second < 0 || np.first >= STAGE_WIDTH || np.second >= STAGE_HEIGHT) continue;
+
+			//壁なら探索しない
+			if (stageData[np.second][np.first] == STAGE_OBJ::WALL) continue;
+
+			//探索する方向よりコストが大きいならスルー
+			if (dist[np.second][np.first] <= MazeDataDijkstra[np.second][np.first].weight + cost) continue;
+
+			//最短距離を更新
+			dist[np.second][np.first] = MazeDataDijkstra[np.second][np.first].weight + cost;
+
+			//辿った経路を保存
+			prev[np.second][np.first] = Vec2{ (double)v.first, (double)v.second };
+
+			//今のコストと探索方向の座標を保存
+			pq.push(Mdat(dist[np.second][np.first], np));
+		}
+	}
+
+	std::vector<Vec2> path;
+	int x = endX, y = endX;
+	//_x,_yが-1にならない限り継続 ループ終了後_x = prev[y][x].x , _y = prev[y][x].yを代入
+	for (; endX != -1 || endY != -1; endX = prev[y][x].x, endY = prev[y][x].y) {
+
+		//pathに追跡前の位置を保管
+		path.push_back(Vec2{ (double)endX, (double)endY });
+
+		//x,yの更新
+		x = (int)endX, y = (int)endY;
+	}
+
+	//for (int i = path.size() - 1; i > 0; --i) {
+	//	int x1 = path[i].x, y1 = path[i].y;  // 現在のノード
+	//	int x2 = path[i - 1].x, y2 = path[i - 1].y;  // 1つ前のノード
+
+	//	// 進んだ方向を確認
+	//	for (int j = 0; j < 4; ++j) {
+	//		if (x1 + dx[j] == x2 && y1 + dy[j] == y2) {
+	//			// どの方向に進んだか表示
+	//			cout << "(" << x1 << ", " << y1 << ") から (" << x2 << ", " << y2 << ") へ " << directions[j] << " に進む\n";
+	//			break;
+	//		}
+	//	}
+	//}
 }
 
 std::vector<std::vector<int>> Stage::GetDist()

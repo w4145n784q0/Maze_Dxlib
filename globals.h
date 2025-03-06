@@ -45,3 +45,18 @@
 	
 	const int CHA_WIDTH = 32;
 	const int CHA_HEIGHT = 32;
+
+	inline Point operator +(const Point& p1, const Point& p2) {
+		return Point{ p1.x + p2.x, p1.y + p2.y };
+	}
+
+	inline Point operator -(const Point& p1, const Point& p2) {
+		return Point{ p1.x - p2.x, p1.y - p2.y };
+	}
+
+	inline bool operator == (const Point& p1, const Point& p2) {
+		if (p1.x == p2.x && p1.y == p2.y)
+			return true;
+		else
+			return false;
+	}

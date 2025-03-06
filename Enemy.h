@@ -23,6 +23,8 @@ private:
 
     int RandTimer_;
     std::vector<Vec2> tmpRoute;
+    std::vector<std::vector<int>> stageDist;
+    Point EnemyGridPos;
 public:
     Enemy();
     ~Enemy();
