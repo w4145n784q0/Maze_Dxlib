@@ -335,3 +335,8 @@ std::vector<Vec2> Stage::restore(int _x, int _y)
 	reverse(path.begin(), path.end());
 	return path;
 }
+
+std::vector<std::vector<int>> Stage::GetDist()
+{
+	return dist;
+}

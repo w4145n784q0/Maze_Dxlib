@@ -106,10 +106,10 @@ void Player::Update()
 
 void Player::Draw()
 {
-	ImGui::Begin("config 1");
+	/*ImGui::Begin("config 1");
 	ImGui::Text("Pos.x %.4d", pos_.x);
 	ImGui::Text("Pos.y %.4d", pos_.y);
-	ImGui::End();
+	ImGui::End();*/
 
 	DrawBox(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, GetColor(255, 10, 10), TRUE);
 }

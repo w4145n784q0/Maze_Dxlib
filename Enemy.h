@@ -61,5 +61,4 @@ public:
     /// </summary>
     void DijkstraMove();
 
-    void EnemyBackEmpty();
 };

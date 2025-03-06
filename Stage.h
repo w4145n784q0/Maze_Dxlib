@@ -70,4 +70,6 @@ public:
 	/// <param name="_y">逆追跡を始める位置のy座標</param>
 	/// <returns>探索した経路の配列</returns>
 	std::vector<Vec2> restore(int _x, int _y);
+
+	std::vector<std::vector<int>> GetDist();
 };

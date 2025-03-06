@@ -75,7 +75,7 @@ void Enemy::Update()
 
 		//if (Input::IsKeepKeyDown(KEY_INPUT_SPACE))
 		//{
-			move = { 0,0 };
+			//move = { 0,0 };
 		//}
 		
 		pos_ = { pos_.x + move.x, pos_.y + move.y };
@@ -108,7 +108,7 @@ void Enemy::Update()
 	int cy = (pos_.y / (CHA_HEIGHT))%2;
 	if (prgssx == 0 && prgssy == 0 && cx && cy)
 	{
-		//XYCloserMove();
+		RightHandMove();
 	}
 
 	Point tmp = player->GetGridPos();
@@ -132,6 +132,11 @@ void Enemy::Draw()
 	{
 		DrawBox(itr.x * CHA_WIDTH, itr.y * CHA_HEIGHT, itr.x * CHA_WIDTH + CHA_WIDTH, itr.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(255, 255, 0), FALSE);
 	}
+
+	ImGui::Begin("config 1");
+	ImGui::Text("Size: %.2d", tmpRoute.size());
+	//ImGui::Text("route %.2d", tmpRoute[1].y);
+	ImGui::End();
 }
 
 void Enemy::YCloserMove()
@@ -236,10 +241,7 @@ void Enemy::RightHandMove()
 
 void Enemy::DijkstraMove()
 {
-}
 
-void Enemy::EnemyBackEmpty()
-{
 }
 
 bool Enemy::CheckHit(const Rect& me, const Rect& other)
