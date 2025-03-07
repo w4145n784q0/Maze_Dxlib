@@ -85,6 +85,8 @@ public:
 	/// <returns>Ÿ‚Éi‚Ş•ûŒü</returns>
 	DIR DijkstraRoute(pair<int, int> sp, int endX, int endY);
 
+	DIR DijkstraQueue(pair<int, int> sp, int endX, int endY);
+
 	std::vector<std::vector<int>> GetDist();
 
 	

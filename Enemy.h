@@ -63,6 +63,6 @@ public:
     /// </summary>
     void DijkstraMove();
 
-    void DijkstraMove2();
+    //void DijkstraMove2();
 
 };

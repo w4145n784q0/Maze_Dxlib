@@ -392,6 +392,32 @@ DIR Stage::DijkstraRoute(pair<int, int> sp, int endX,int endY)
 	return DIR::NONE;
 }
 
+DIR Stage::DijkstraQueue(pair<int, int> sp, int endX, int endY)
+{
+	Dijkstra(sp);
+	std::vector path = restore(endX, endY);
+
+	Vec2 start = { sp.first,  sp.second };
+	Vec2 current = { endX,endY };
+	while (prev[current.y][current.x] != start) {
+		current = prev[current.y][current.x];
+	}
+
+	if (current.x > sp.first) {
+		return RIGHT;
+	}
+	else if (current.x < sp.first) {
+		return LEFT;
+	}
+	else if (current.y > sp.second) {
+		return DOWN;
+	}
+	else if (current.y < sp.second) {
+		return UP;
+	}
+	return NONE;
+}
+
 std::vector<std::vector<int>> Stage::GetDist()
 {
 	return dist;

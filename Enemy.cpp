@@ -258,19 +258,8 @@ void Enemy::DijkstraMove()
 {
 	Stage* stage = (Stage*)FindGameObject<Stage>();
 	Player* player = (Player*)FindGameObject<Player>();
-	forward_ = stage->DijkstraRoute({ EnemyGridPos.x , EnemyGridPos.y }, player->GetGridPos().x, player->GetGridPos().y);
-}
-
-void Enemy::DijkstraMove2()
-{
-	DIR myRight[4] = { RIGHT, LEFT, UP, DOWN };
-	DIR myLeft[4] = { LEFT, RIGHT, DOWN, UP };
-	Point nposF = { pos_.x + nDir[forward_].x, pos_.y + nDir[forward_].y };
-	Point nposR = { pos_.x + nDir[myRight[forward_]].x, pos_.y + nDir[myRight[forward_]].y };
-	Rect myRectF{ nposF.x, nposF.y, CHA_WIDTH, CHA_HEIGHT };
-	Rect myRectR{ nposR.x, nposR.y, CHA_WIDTH, CHA_HEIGHT };
-	Stage* stage = (Stage*)FindGameObject<Stage>();
-
+	//forward_ = stage->DijkstraRoute({ EnemyGridPos.x , EnemyGridPos.y }, player->GetGridPos().x, player->GetGridPos().y);
+	forward_ = stage->DijkstraQueue({ EnemyGridPos.x , EnemyGridPos.y }, player->GetGridPos().x, player->GetGridPos().y);
 }
 
 bool Enemy::CheckHit(const Rect& me, const Rect& other)

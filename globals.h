@@ -60,3 +60,24 @@
 		else
 			return false;
 	}
+
+	inline bool operator != (const Point& p1, const Point& p2) {
+		if (p1.x != p2.x || p1.y != p2.y)
+			return true;
+		else
+			return false;
+	}
+
+	inline bool operator == (const Vec2& p1, const Vec2& p2) {
+		if (p1.x == p2.x && p1.y == p2.y)
+			return true;
+		else
+			return false;
+	}
+
+	inline bool operator != (const Vec2& p1, const Vec2& p2) {
+		if (p1.x != p2.x || p1.y != p2.y)
+			return true;
+		else
+			return false;
+	}
