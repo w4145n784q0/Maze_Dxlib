@@ -63,6 +63,8 @@ public:
     /// </summary>
     void DijkstraMove();
 
+    void BFS(pair<int, int> start,Vec2 goal);
+
     //void DijkstraMove2();
 
 };

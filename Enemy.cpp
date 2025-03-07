@@ -6,6 +6,9 @@
 #include "./Source/Input.h"
 #include "ImGui/imgui.h"
 #include <algorithm> 
+#include<queue>
+
+using std::queue;
 
 namespace
 {
@@ -18,6 +21,9 @@ namespace
 	int temp = 1;
 
 	DIR dirlist[] = { UP,DOWN,LEFT,RIGHT };
+
+	std::vector<std::vector<int>> Edist = vector(STAGE_HEIGHT, vector<int>(STAGE_WIDTH, INT_MAX));
+	std::vector<std::vector<Vec2>> Eprev = vector(STAGE_HEIGHT, vector<Vec2>(STAGE_WIDTH, { -1, -1 }));
 }
 
 Enemy::Enemy()
@@ -256,10 +262,71 @@ void Enemy::RightHandMove()
 
 void Enemy::DijkstraMove()
 {
-	Stage* stage = (Stage*)FindGameObject<Stage>();
-	Player* player = (Player*)FindGameObject<Player>();
+	//Stage* stage = (Stage*)FindGameObject<Stage>();
+	//Player* player = (Player*)FindGameObject<Player>();
 	//forward_ = stage->DijkstraRoute({ EnemyGridPos.x , EnemyGridPos.y }, player->GetGridPos().x, player->GetGridPos().y);
-	forward_ = stage->DijkstraQueue({ EnemyGridPos.x , EnemyGridPos.y }, player->GetGridPos().x, player->GetGridPos().y);
+	//forward_ = stage->DijkstraQueue({ EnemyGridPos.x , EnemyGridPos.y }, player->GetGridPos().x, player->GetGridPos().y);
+
+
+}
+
+void Enemy::BFS(pair<int,int> start, Vec2 goal)
+{
+	Stage* stage = (Stage*)FindGameObject<Stage>();
+
+	using Mdat = std::pair<int, Point>;
+	Edist[start.second][start.first] = 0;
+	std::queue<Mdat> q;
+	q.push(Mdat(0, { start.first, start.second }));
+
+	vector<vector<STAGE_OBJ>> stageData = ((Stage*)FindGameObject<Stage>())->GetStageGrid();
+
+	while (!q.empty())
+	{
+		Mdat p = q.front();
+		q.pop();
+
+		int cost = p.first;
+		Point v = p.second;
+
+		for (int i = 0; i < 4; i++)
+		{
+			Vec2Int np = { v.x + (int)dirs[i].x, v.y + (int)dirs[i].y };
+			
+
+			if (np.first < 0 || np.second < 0 || np.first >= STAGE_WIDTH || np.second >= STAGE_HEIGHT) continue;
+			if (stageData[np.second][np.first] == STAGE_OBJ::WALL) continue;
+
+			//int newDist = c + stageData[np.y][np.x].weight;
+
+			std::vector<std::vector<floorData>> sd = stage->GetMazeDataDijkstra();
+			if (Edist[np.second][np.first] <= sd[np.second][np.first].weight + cost) continue;
+
+			Edist[np.second][np.first] = sd[np.second][np.first].weight + cost;
+			Eprev[np.second][np.first] = Vec2{ (double)v.x, (double)v.y };
+			q.push(Mdat(Edist[np.second][np.first], np));
+			}
+		}
+	}
+	// Å’ZŒo˜H•œŒ³iŽŸ‚ÉˆÚ“®‚·‚×‚«•ûŒü‚ðŒˆ’èj
+	Vec2 current = ; // ƒS[ƒ‹’n“_‚©‚çŽn‚ß‚é
+	while (Eprev[current.y][current.x] != sp) {
+		current = Eprev[current.y][current.x];
+	}
+
+	// current‚ªÅ’ZŒo˜Hã‚ÌÅ‰‚Ìˆê•àBŒ»Ý‚Ì“G‚ÌˆÊ’u‚Æ”äŠr‚µ‚ÄŽŸ‚ÉˆÚ“®‚·‚é‚×‚«•ûŒü‚ðŒˆ’è
+	if (current.x > sp.x) {
+		forward_ = RIGHT;
+	}
+	else if (current.x < sp.x) {
+		forward_ = LEFT;
+	}
+	else if (current.y > sp.y) {
+		forward_ = DOWN;
+	}
+	else if (current.y < sp.y) {
+		forward_ = UP;
+	}
 }
 
 bool Enemy::CheckHit(const Rect& me, const Rect& other)

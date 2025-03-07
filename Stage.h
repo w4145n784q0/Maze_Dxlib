@@ -89,5 +89,7 @@ public:
 
 	std::vector<std::vector<int>> GetDist();
 
+	std::vector<std::vector<floorData>> GetMazeDataDijkstra();
+
 	
 };

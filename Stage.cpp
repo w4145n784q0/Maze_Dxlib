@@ -422,3 +422,8 @@ std::vector<std::vector<int>> Stage::GetDist()
 {
 	return dist;
 }
+
+std::vector<std::vector<floorData>> Stage::GetMazeDataDijkstra()
+{
+	return std::vector<std::vector<floorData>>();
+}
