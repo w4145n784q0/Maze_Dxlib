@@ -9,7 +9,7 @@
 
 namespace
 {
-	//四方向(↓,↑,←,→)
+	//四方向(↑,↓,←,→)
 	Point nDir[4] = { {0,-1},{0,1},{-1,0},{1,0} };
 
 	//ランダム移動の切り替え時間
@@ -60,13 +60,12 @@ Enemy::Enemy()
 		}
 	}
 
+	EnemyGridPos = { pos_.x / 32, pos_.y / 32 };
 	Point tmp = player->GetGridPos();
-	stage->Dijkstra({ (pos_.x / 32), (pos_.y / 32) });
+	stage->Dijkstra({EnemyGridPos.x, EnemyGridPos.y });
 	tmpRoute = stage->restore(tmp.x, tmp.y);//ルートを保存
 	stageDist = stage->GetDist();
-	Point a = player->GetGridPos();
-
-	EnemyGridPos = { pos_.x / 32, pos_.y / 32 };
+	
 }
 
 Enemy::~Enemy()
@@ -125,9 +124,9 @@ void Enemy::Update()
 		DijkstraMove();
 	}
 
-	Point tmp = player->GetGridPos();
-	tmpRoute = stage->restore(tmp.x, tmp.y);//ゴールまでの道のりを保存
-	stageDist = stage->GetDist();//コストを保存
+	//Point tmp = player->GetGridPos();
+	//tmpRoute = stage->restore(tmp.x, tmp.y);//ゴールまでの道のりを保存
+	//stageDist = stage->GetDist();//コストを保存
 }
 
 void Enemy::Draw()
@@ -149,8 +148,8 @@ void Enemy::Draw()
 	}
 
 	ImGui::Begin("config 1");
-	ImGui::Text("Size: %.2d", tmpRoute.size());
-
+	ImGui::Text("Size: %.2d", EnemyGridPos.x);
+	ImGui::Text("Size: %.2d", EnemyGridPos.y);
 	ImGui::End();
 }
 
@@ -257,7 +256,20 @@ void Enemy::RightHandMove()
 void Enemy::DijkstraMove()
 {
 	Stage* stage = (Stage*)FindGameObject<Stage>();
-	forward_ = stage->DijkstraRoute({ (pos_.x / 32), (pos_.y / 32) });
+	Player* player = (Player*)FindGameObject<Player>();
+	forward_ = stage->DijkstraRoute({ EnemyGridPos.x , EnemyGridPos.y }, player->GetGridPos().x, player->GetGridPos().y);
+}
+
+void Enemy::DijkstraMove2()
+{
+	DIR myRight[4] = { RIGHT, LEFT, UP, DOWN };
+	DIR myLeft[4] = { LEFT, RIGHT, DOWN, UP };
+	Point nposF = { pos_.x + nDir[forward_].x, pos_.y + nDir[forward_].y };
+	Point nposR = { pos_.x + nDir[myRight[forward_]].x, pos_.y + nDir[myRight[forward_]].y };
+	Rect myRectF{ nposF.x, nposF.y, CHA_WIDTH, CHA_HEIGHT };
+	Rect myRectR{ nposR.x, nposR.y, CHA_WIDTH, CHA_HEIGHT };
+	Stage* stage = (Stage*)FindGameObject<Stage>();
+
 }
 
 bool Enemy::CheckHit(const Rect& me, const Rect& other)

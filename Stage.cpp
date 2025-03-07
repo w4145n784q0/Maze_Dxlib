@@ -250,6 +250,10 @@ void Stage::Draw()
 	{
 		DrawBox(itr.x * CHA_WIDTH, itr.y * CHA_HEIGHT, itr.x * CHA_WIDTH + CHA_WIDTH, itr.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(255, 255, 0), FALSE);
 	}*/
+	for (auto itr : route_)
+	{
+		DrawBox(itr.x * CHA_WIDTH, itr.y * CHA_HEIGHT, itr.x * CHA_WIDTH + CHA_WIDTH, itr.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(255, 220, 0), TRUE);
+	}
 }
 
 void Stage::setStageRects()
@@ -337,7 +341,7 @@ std::vector<Vec2> Stage::restore(int _x, int _y)
 	return path;
 }
 
-void Stage::DijkstraRoute(pair<int, int> sp, int endX,int endY)
+DIR Stage::DijkstraRoute(pair<int, int> sp, int endX,int endY)
 {
 	//dist[1(y)][1(x)]をコストを0で初期化
 	dist[sp.second][sp.first] = 0;
@@ -361,9 +365,7 @@ void Stage::DijkstraRoute(pair<int, int> sp, int endX,int endY)
 
 		for (int i = 0; i < 4; i++)
 		{
-			//探索方向　dirs[0]~[3]から一個ずつ確認
-			//first : 探索先のx方向
-			//second : 探索先のy方向
+			//探索方向 dirs[0]~[3]から一個ずつ確認
 			Vec2Int np = { v.first + (int)dirs[i].x, v.second + (int)dirs[i].y };
 
 			//0かグリッドを超える探索はしない
@@ -387,30 +389,45 @@ void Stage::DijkstraRoute(pair<int, int> sp, int endX,int endY)
 	}
 
 	std::vector<Vec2> path;
-	int x = endX, y = endX;
-	//_x,_yが-1にならない限り継続 ループ終了後_x = prev[y][x].x , _y = prev[y][x].yを代入
-	for (; endX != -1 || endY != -1; endX = prev[y][x].x, endY = prev[y][x].y) {
-
-		//pathに追跡前の位置を保管
+	int ex = endX, ey = endX;
+	// _x,_yが-1にならない限り継続
+	for (; endX != -1 || endY != -1; endX = prev[ey][ex].x, endY = prev[ey][ex].y) {
 		path.push_back(Vec2{ (double)endX, (double)endY });
-
-		//x,yの更新
-		x = (int)endX, y = (int)endY;
+		ex = (int)endX, ey = (int)endY;
 	}
 
-	//for (int i = path.size() - 1; i > 0; --i) {
-	//	int x1 = path[i].x, y1 = path[i].y;  // 現在のノード
-	//	int x2 = path[i - 1].x, y2 = path[i - 1].y;  // 1つ前のノード
+	if (path.empty())
+		return DIR::NONE;
 
-	//	// 進んだ方向を確認
-	//	for (int j = 0; j < 4; ++j) {
-	//		if (x1 + dx[j] == x2 && y1 + dy[j] == y2) {
-	//			// どの方向に進んだか表示
-	//			cout << "(" << x1 << ", " << y1 << ") から (" << x2 << ", " << y2 << ") へ " << directions[j] << " に進む\n";
-	//			break;
-	//		}
-	//	}
-	//}
+	// 経路を最初からたどる（pathのスタートの値が配列の最後に入っている）
+	for (int i = path.size() - 1; i > 0; i--)
+	{
+		Vec2 NowPos = path[i];//今のpath
+		Vec2 NextPos = path[i - 1];//一つ先のpath
+		double findX = path[i].x - path[i - 1].x;
+		double findY = path[i].y - path[i - 1].y;
+		Vec2 FindPos = { findX,findY };
+		
+		if (FindPos.x == 0 && FindPos.y == -1)//↑
+		{
+			return UP;
+		}
+		if (FindPos.x == 0 && FindPos.y == 1)//↓
+		{
+			return DOWN;
+		}
+		if (FindPos.x == 1 && FindPos.y == 0)//→
+		{
+			return RIGHT;
+		}
+		if (FindPos.x == -1 && FindPos.y == 0)//←
+		{
+			return LEFT;
+		}
+
+	}
+
+	return DIR::NONE;
 }
 
 std::vector<std::vector<int>> Stage::GetDist()

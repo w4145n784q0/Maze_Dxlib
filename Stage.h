@@ -34,11 +34,11 @@ const Point START_POINT{ 1,1 };
 const Point GOAL_POINT{ STAGE_WIDTH - 2,STAGE_HEIGHT - 2 };
 
 //ダイクストラ法用
-	//ステージの一ブロックごとのタイプとウェイトを保存
+//ステージの一ブロックごとのタイプとウェイトを保存
 struct floorData
 {
-	STAGE_OBJ type;
-	int  weight;
+	STAGE_OBJ type; //そのブロックの種類 floor,wall...
+	int  weight; //移動コスト
 };
 
 class Stage :
@@ -47,6 +47,8 @@ class Stage :
 	vector<vector<STAGE_OBJ>> stageData;
 	vector<Rect> stageRects;
 	std::vector<Vec2> route;
+
+	std::vector<Vec2> route_;
 public:
 	Stage();
 	~Stage();
@@ -71,8 +73,14 @@ public:
 	/// <returns>探索した経路の配列</returns>
 	std::vector<Vec2> restore(int _x, int _y);
 
-	
-	void DijkstraRoute(pair<int, int> sp, int endX, int endY);
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="sp">全探索の始点</param>
+	/// <param name="endX">逆追跡を始める位置のx座標</param>
+	/// <param name="endY">逆追跡を始める位置のy座標</param>
+	/// <returns>次に進む方向</returns>
+	DIR DijkstraRoute(pair<int, int> sp, int endX, int endY);
 
 	std::vector<std::vector<int>> GetDist();
 
