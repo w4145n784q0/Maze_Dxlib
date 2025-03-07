@@ -4,6 +4,7 @@
 #include<queue>
 #include<concurrent_priority_queue.h>
 #include<string>
+#include "ImGui/imgui.h"
 
 using std::vector;
 
@@ -254,6 +255,14 @@ void Stage::Draw()
 	{
 		DrawBox(itr.x * CHA_WIDTH, itr.y * CHA_HEIGHT, itr.x * CHA_WIDTH + CHA_WIDTH, itr.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(255, 220, 0), TRUE);
 	}
+
+	ImGui::Begin("config 1");
+	ImGui::Text("x: %.1d", sx);
+	ImGui::Text("y: %.1d", sy);
+
+	//ImGui::Text("nextx: %.1d", sx2);
+	//ImGui::Text("nexty: %.1d", sy2);
+	ImGui::End();
 }
 
 void Stage::setStageRects()
@@ -343,90 +352,43 @@ std::vector<Vec2> Stage::restore(int _x, int _y)
 
 DIR Stage::DijkstraRoute(pair<int, int> sp, int endX,int endY)
 {
-	//dist[1(y)][1(x)]をコストを0で初期化
-	dist[sp.second][sp.first] = 0;
-
-	//Mdat型、Mdat型コンテナ、昇順
-	std::priority_queue<Mdat, std::vector<Mdat>, std::greater<Mdat>> pq;
-
-	//コスト0,座標1,1で初期化
-	pq.push(Mdat(0, { sp.first, sp.second }));
-
-	while (!pq.empty())
-	{
-		Mdat p = pq.top();
-		pq.pop();
-
-		//最短距離を保管
-		int cost = p.first;
-
-		//現在値を保管
-		Vec2Int v = p.second;
-
-		for (int i = 0; i < 4; i++)
-		{
-			//探索方向 dirs[0]~[3]から一個ずつ確認
-			Vec2Int np = { v.first + (int)dirs[i].x, v.second + (int)dirs[i].y };
-
-			//0かグリッドを超える探索はしない
-			if (np.first < 0 || np.second < 0 || np.first >= STAGE_WIDTH || np.second >= STAGE_HEIGHT) continue;
-
-			//壁なら探索しない
-			if (stageData[np.second][np.first] == STAGE_OBJ::WALL) continue;
-
-			//探索する方向よりコストが大きいならスルー
-			if (dist[np.second][np.first] <= MazeDataDijkstra[np.second][np.first].weight + cost) continue;
-
-			//最短距離を更新
-			dist[np.second][np.first] = MazeDataDijkstra[np.second][np.first].weight + cost;
-
-			//辿った経路を保存
-			prev[np.second][np.first] = Vec2{ (double)v.first, (double)v.second };
-
-			//今のコストと探索方向の座標を保存
-			pq.push(Mdat(dist[np.second][np.first], np));
-		}
-	}
-
-	std::vector<Vec2> path;
-	int ex = endX, ey = endX;
-	// _x,_yが-1にならない限り継続
-	for (; endX != -1 || endY != -1; endX = prev[ey][ex].x, endY = prev[ey][ex].y) {
-		path.push_back(Vec2{ (double)endX, (double)endY });
-		ex = (int)endX, ey = (int)endY;
-	}
-
+	Dijkstra(sp);
+	std::vector path = restore(endX, endY);
+	
 	if (path.empty())
 		return DIR::NONE;
 
-	// 経路を最初からたどる（pathのスタートの値が配列の最後に入っている）
-	for (int i = path.size() - 1; i > 0; i--)
+	int index = -1;
+	for (int i = 0; i < path.size(); i++)
 	{
-		Vec2 NowPos = path[i];//今のpath
-		Vec2 NextPos = path[i - 1];//一つ先のpath
-		double findX = path[i].x - path[i - 1].x;
-		double findY = path[i].y - path[i - 1].y;
-		Vec2 FindPos = { findX,findY };
-		
-		if (FindPos.x == 0 && FindPos.y == -1)//↑
+		if (path[i].x == sp.first && path[i].y == sp.second) 
 		{
-			return UP;
+			index = i;
+			break;
 		}
-		if (FindPos.x == 0 && FindPos.y == 1)//↓
-		{
-			return DOWN;
-		}
-		if (FindPos.x == 1 && FindPos.y == 0)//→
-		{
-			return RIGHT;
-		}
-		if (FindPos.x == -1 && FindPos.y == 0)//←
-		{
-			return LEFT;
-		}
-
 	}
+	if(index >= path.size() - 1)
+		return DIR::NONE;
 
+	int findX = path[index + 1].x - path[index].x;
+	int findY = path[index + 1].y - path[index].y;
+	Vec2 FindPos = { findX,findY };
+
+	sx = FindPos.x;
+	sy = FindPos.y;
+	//sx2 = path[index + 1].x;
+	//sy2 = path[index + 1].y;
+
+	DIR dirs[] = { UP, DOWN, LEFT, RIGHT };
+	Point Xdir[] = { {0, -1}, {0, 1}, {-1, 0}, {1, 0} };
+	for (int i = 0; i < 4; i++)
+	{
+		if ((int)FindPos.x == Xdir[i].x && (int)FindPos.y == Xdir[i].y)
+		{
+			return dirs[i];
+		}
+	}
+	
 	return DIR::NONE;
 }
 

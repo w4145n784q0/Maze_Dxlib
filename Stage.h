@@ -49,6 +49,9 @@ class Stage :
 	std::vector<Vec2> route;
 
 	std::vector<Vec2> route_;
+
+	int sx, sy, sx2, sy2;
+
 public:
 	Stage();
 	~Stage();
@@ -76,7 +79,7 @@ public:
 	/// <summary>
 	/// 
 	/// </summary>
-	/// <param name="sp">全探索の始点</param>
+	/// <param name="sp">全探索のスタート地点(現在位置)</param>
 	/// <param name="endX">逆追跡を始める位置のx座標</param>
 	/// <param name="endY">逆追跡を始める位置のy座標</param>
 	/// <returns>次に進む方向</returns>

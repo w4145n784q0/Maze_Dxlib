@@ -32,7 +32,7 @@ Enemy::Enemy()
 	}
 
 	pos_ = { rx * CHA_WIDTH, ry * CHA_HEIGHT };
-	forward_ = RIGHT;
+	forward_ = NONE;
 
 	Stage* stage = (Stage*)FindGameObject<Stage>();
 	Player* player = (Player*)FindGameObject<Player>();
@@ -78,7 +78,7 @@ void Enemy::Update()
 	Player* player = (Player*)FindGameObject<Player>();
 	static bool stop = false;
 
-	EnemyGridPos = { pos_.x / 32, pos_.y / 32 };
+	EnemyGridPos = { (int)pos_.x / 32, (int)pos_.y / 32 };
 
 	if (!stop) {
 		Point op = pos_;
@@ -88,7 +88,7 @@ void Enemy::Update()
 
 		//if (Input::IsKeepKeyDown(KEY_INPUT_SPACE))
 		//{
-			//move = { 0,0 };
+		//	move = { 0,0 };
 		//}
 		
 		pos_ = { pos_.x + move.x, pos_.y + move.y };
@@ -110,7 +110,7 @@ void Enemy::Update()
 					pos_ = op;
 				}
 				//forward_ = (DIR)(GetRand(3));
-				RightHandMove();
+				//RightHandMove();
 				break;
 			}
 		}
@@ -148,8 +148,9 @@ void Enemy::Draw()
 	}
 
 	ImGui::Begin("config 1");
-	ImGui::Text("Size: %.2d", EnemyGridPos.x);
-	ImGui::Text("Size: %.2d", EnemyGridPos.y);
+	ImGui::Text("forward: %.1d", forward_);
+	//ImGui::Text("x: %.1d", EnemyGridPos.x);
+	//ImGui::Text("y: %.1d", EnemyGridPos.y);
 	ImGui::End();
 }
 
