@@ -48,7 +48,6 @@ class Stage :
 	vector<Rect> stageRects;
 	std::vector<Vec2> route;
 
-	std::vector<Vec2> route_;
 
 	int sx, sy, sx2, sy2;
 
@@ -57,7 +56,7 @@ public:
 	~Stage();
 	void Update() override;
 	void Draw() override;
-	STAGE_OBJ GetStageData(int x, int y) {return stageData[y][x];}
+	STAGE_OBJ GetStageDataXY(int x, int y) {return stageData[y][x];}
 	vector<Rect> GetStageRects() { return stageRects; }
 	vector<vector<STAGE_OBJ>>& GetStageGrid() { return stageData; }
 	void setStageRects();
@@ -88,7 +87,7 @@ public:
 	DIR DijkstraQueue(pair<int, int> sp, int endX, int endY);
 
 	std::vector<std::vector<int>> GetDist();
-
+	vector<vector<STAGE_OBJ>> GetstageData() { return stageData; }
 	std::vector<std::vector<floorData>> GetMazeDataDijkstra();
 
 	

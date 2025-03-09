@@ -27,9 +27,11 @@ private:
     Point EnemyGridPos;
     Point PlayerGritPos;
     std::vector<Vec2> CurrentRoute;
+
     int index_path = 0;
     std::vector<Vec2> cp;
     int fx, fy;
+    int cx, cy;
 public:
     Enemy();
     ~Enemy();
@@ -69,7 +71,8 @@ public:
     void DijkstraMove();
 
     void BFS(std:: pair<int, int> start, int endX, int endY);
-
+    void EnemyDijkstra(std::pair<int, int> start);
+    std::vector<Vec2> EnemyRestore(int _x, int _y);
     //void DijkstraMove2();
 
 };

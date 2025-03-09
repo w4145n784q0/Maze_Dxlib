@@ -239,10 +239,10 @@ void Stage::Draw()
 			}
 			if (dist[y][x] < INT_MAX)
 			{
-				std::string s = std::to_string(dist[y][x]);
-				const char* c = s.c_str();
+				//std::string s = std::to_string(dist[y][x]);
+				//const char* c = s.c_str();
 				//ゴールまでのコストを表示
-				DrawFormatString(x * CHA_WIDTH, y * CHA_HEIGHT,GetColor(0,0,255), "%s", c);
+				//DrawFormatString(x * CHA_WIDTH, y * CHA_HEIGHT,GetColor(0,0,255), "%s", c);
 			}
 		}
 	}

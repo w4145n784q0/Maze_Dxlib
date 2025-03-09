@@ -125,16 +125,18 @@ void Enemy::Update()
 			}
 		}
 	}
+	
 	int prgssx = pos_.x % (CHA_WIDTH);
 	int prgssy = pos_.y % (CHA_HEIGHT);
-	int cx = (pos_.x / (CHA_WIDTH))%2;
-	int cy = (pos_.y / (CHA_HEIGHT))%2;
-	if (prgssx == 0 && prgssy == 0 && cx && cy)
+
+	//int cx = (pos_.x / (CHA_WIDTH))%2;
+	//int cy = (pos_.y / (CHA_HEIGHT))%2;
+	if (prgssx == 0 && prgssy == 0 /*&& cx && cy*/)
 	{
 		BFS({ EnemyGridPos.x , EnemyGridPos.y }, PlayerGritPos.x, PlayerGritPos.y);
-		
-	}
 
+	}
+	//BFS({ EnemyGridPos.x , EnemyGridPos.y }, PlayerGritPos.x, PlayerGritPos.y);
 	//Point tmp = player->GetGridPos();
 	tmpRoute = stage->restore(PlayerGritPos.x ,PlayerGritPos.y);//ゴールまでの道のりを保存
 	//stageDist = stage->GetDist();//コストを保存
@@ -153,20 +155,33 @@ void Enemy::Draw()
 
 	DrawTriangle(tp[forward_][0].x, tp[forward_][0].y, tp[forward_][1].x, tp[forward_][1].y, tp[forward_][2].x, tp[forward_][2].y, GetColor(255,255,255), TRUE);
 
-	for (auto itr : tmpRoute)
+	/*for (auto itr : tmpRoute)
 	{
 		DrawBox(itr.x * CHA_WIDTH, itr.y * CHA_HEIGHT, itr.x * CHA_WIDTH + CHA_WIDTH, itr.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(255, 255, 0), FALSE);
-	}
+	}*/
 
-	for (auto itr : CurrentRoute)
+	for (auto itr : cp)
 	{
-		DrawBox(itr.x * CHA_WIDTH, itr.y * CHA_HEIGHT, itr.x * CHA_WIDTH + CHA_WIDTH, itr.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(255, 230, 0), TRUE);
+		DrawBox(itr.x * CHA_WIDTH, itr.y * CHA_HEIGHT, itr.x * CHA_WIDTH + CHA_WIDTH, itr.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(255, 230, 0), FALSE);
+	}
+	for (int y = 0; y < STAGE_HEIGHT; y++)
+	{
+		for (int x = 0; x < STAGE_WIDTH; x++)
+		{
+			if (Edist[y][x] < INT_MAX)
+			{
+				std::string s = std::to_string(Edist[y][x]);
+				const char* c = s.c_str();
+				//ゴールまでのコストを表示
+				DrawFormatString(x * CHA_WIDTH, y * CHA_HEIGHT,GetColor(0,0,255), "%s", c);
+			}
+		}
 	}
 
 	ImGui::Begin("config 1");
-	//ImGui::Text("forward: %.1d", forward_);
-	ImGui::Text("fx: %.1d", fx);
-	ImGui::Text("fy: %.1d", fy);
+	ImGui::Text("forward: %.1d", forward_);
+	ImGui::Text("fx: %.1d,fy: %.1d", fx,fy);
+	ImGui::Text("cx: %.1d,cy: %.1d", cx, cy);
 	
 	ImGui::End();
 }
@@ -283,6 +298,51 @@ void Enemy::DijkstraMove()
 
 void Enemy::BFS(pair<int, int> start, int endX, int endY)
 {
+
+	EnemyDijkstra(start);
+	std::vector<Vec2> path = EnemyRestore(endX, endY);
+	cp = path;
+	if (path.empty())
+	{
+		forward_ = NONE;
+		return;
+	}
+	// 現在の位置 (path[0]) と次の位置 (path[1]) を取得
+	Vec2 currentPosition = path[0];
+	Vec2 nextPosition = path[1];
+	fx = (int)currentPosition.x;
+	fy = (int)currentPosition.y;
+	cx = (int)nextPosition.x;
+	cy = (int)nextPosition.y;
+
+	// 次の位置に進む方向を判定
+	int dx = nextPosition.x - currentPosition.x;
+	int dy = nextPosition.y - currentPosition.y;
+
+
+	// 各方向に対して、dx, dy の値に基づいて進む方向を決定
+	if (dx == 1 && dy == 0) {
+		forward_ = RIGHT; // 右に進む
+	}
+	else if (dx == -1 && dy == 0) {
+		forward_ = LEFT; // 左に進む
+	}
+	else if (dx == 0 && dy == 1) {
+		forward_ = DOWN; // 下に進む
+	}
+	else if (dx == 0 && dy == -1) {
+		forward_ = UP; // 上に進む
+	}
+	else {
+		forward_ = NONE; // 進む方向がわからない場合
+	}
+	path.erase(path.begin()); // path[0]を削除して次の座標を先頭に持ってくる
+}
+
+void Enemy::EnemyDijkstra(std::pair<int, int> start)
+{
+	Stage* stage = (Stage*)FindGameObject<Stage>();
+
 	//dist[1(y)][1(x)]をコストを0で初期化
 	Edist[start.second][start.first] = 0;
 
@@ -291,9 +351,6 @@ void Enemy::BFS(pair<int, int> start, int endX, int endY)
 
 	//コスト0,座標1,1で初期化
 	pq.push(Mdat(0, { start.first, start.second }));
-
-	//一ブロックをEMPTYで初期化
-	vector<vector<STAGE_OBJ>> stageData = vector(STAGE_HEIGHT, vector<STAGE_OBJ>(STAGE_WIDTH, STAGE_OBJ::EMPTY));;
 
 	while (!pq.empty())
 	{
@@ -317,7 +374,7 @@ void Enemy::BFS(pair<int, int> start, int endX, int endY)
 			if (np.first < 0 || np.second < 0 || np.first >= STAGE_WIDTH || np.second >= STAGE_HEIGHT) continue;
 
 			//壁なら探索しない
-			if (stageData[np.second][np.first] == STAGE_OBJ::WALL) continue;
+			if ( stage->GetStageDataXY(np.first, np.second) == STAGE_OBJ::WALL) continue;
 
 			//探索する方向よりコストが大きいならスルー
 			if (Edist[np.second][np.first] <= MazeCost[np.second][np.first].weight + cost) continue;
@@ -333,72 +390,23 @@ void Enemy::BFS(pair<int, int> start, int endX, int endY)
 		}
 	}
 
-	//Enemyの位置からプレイヤーの位置までの座標
+}
+
+std::vector<Vec2> Enemy::EnemyRestore(int _x, int _y)
+{
 	std::vector<Vec2> path;
+	int x = _x, y = _y;
+	//_x,_yが-1にならない限り継続 ループ終了後_x = prev[y][x].x , _y = prev[y][x].yを代入
+	for (; _x != -1 || _y != -1; _x = Eprev[y][x].x, _y = Eprev[y][x].y) {
 
-	//開始位置をvec2に保管
-	Vec2 sVec = { start.first,  start.second };
-	Stage* stage = (Stage*)FindGameObject<Stage>();
-	path = stage->restore(endX,endY);
-	cp = path;
-	//CurrentRoute = path;
+		//pathに追跡前の位置を保管
+		path.push_back(Vec2{ (double)_x, (double)_y });
 
-	if (path.empty() || index_path > path.size())
-		forward_ = NONE;
-
-	int findX = path[index_path + 1].x - path[index_path + 0].x;
-	int findY = path[index_path + 1].y - path[index_path + 0].y;
-	fx = findX;
-	fy = findY;
-	Vec2 FindPos = { findX,findY };
-	CurrentRoute.push_back(path[index_path]);
-	index_path++;
-	/*int index = -1;
-	for (int i = 0; i < path.size(); i++)
-	{
-		if (path[i].x == start.first && path[i].y == start.second)
-		{
-			index = i;
-			CurrentRoute.push_back(path[i]);
-			break;
-		}
-		else
-		{
-			index = i;
-		}
+		//x,yの更新
+		x = (int)_x, y = (int)_y;
 	}
-	if (index >= path.size() - 1)
-		forward_ = NONE;
-
-	int findX = path[index + 1].x - path[index].x;
-	int findY = path[index + 1].y - path[index].y;
-	Vec2 FindPos = { findX,findY };*/
-
-	if (FindPos == Vec2{0, -1})
-	{
-		forward_ = UP;
-	}
-	else if (FindPos == Vec2{0, 1})
-	{
-		forward_ = DOWN;
-	}
-	else if (FindPos == Vec2{-1, 0})
-	{
-		forward_ = LEFT;
-	}
-	else if (FindPos == Vec2{1, 0})
-	{
-		forward_ = RIGHT;
-	}
-	else
-		forward_ = NONE;
-	/*int i = 0;
-	while (path[i] != endVec)
-	{
-		if(path[i])
-		i++;
-	}*/
-	
+	reverse(path.begin(), path.end());
+	return path;
 }
 
 bool Enemy::CheckHit(const Rect& me, const Rect& other)
