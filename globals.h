@@ -54,6 +54,14 @@
 		return Point{ p1.x - p2.x, p1.y - p2.y };
 	}
 
+	inline Vec2 operator + (const Vec2& p1, const Vec2& p2) {
+		return Vec2{ p1.x + p2.x , p1.y + p2.y };
+	}
+
+	inline Vec2 operator - (const Vec2& p1, const Vec2& p2) {
+		return Vec2{ p1.x - p2.x , p1.y - p2.y };
+	}
+
 	inline bool operator == (const Point& p1, const Point& p2) {
 		if (p1.x == p2.x && p1.y == p2.y)
 			return true;

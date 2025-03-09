@@ -19,7 +19,7 @@ namespace {
 
 
 Player::Player()
-	: pos_({ CHA_WIDTH , CHA_HEIGHT }), playerImage_(-1)
+	: pos_({ CHA_WIDTH , CHA_HEIGHT }), playerImage_(-1),GridPos_(GetGridPos())
 {
 	
 }
@@ -102,14 +102,17 @@ void Player::Update()
 			}
 		}
 	}
+
+	GridPos_ = GetGridPos();
+
 }
 
 void Player::Draw()
 {
-	/*ImGui::Begin("config 1");
-	ImGui::Text("Pos.x %.4d", pos_.x);
-	ImGui::Text("Pos.y %.4d", pos_.y);
-	ImGui::End();*/
+	//ImGui::Begin("config 1");
+	ImGui::Text("Pos.x %.1d", GridPos_.x);
+	ImGui::Text("Pos.y %.1d", GridPos_.y);
+	//ImGui::End();
 
 	DrawBox(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, GetColor(255, 10, 10), TRUE);
 }

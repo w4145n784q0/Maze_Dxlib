@@ -18,7 +18,7 @@ namespace
 	//ランダム移動の切り替え時間
 	const int ChangeTimer = 600;
 
-	int temp = 1;
+	std::vector<std::vector<floorData>> MazeCost;
 
 	DIR dirlist[] = { UP,DOWN,LEFT,RIGHT };
 
@@ -71,6 +71,9 @@ Enemy::Enemy()
 	stage->Dijkstra({EnemyGridPos.x, EnemyGridPos.y });
 	tmpRoute = stage->restore(tmp.x, tmp.y);//ルートを保存
 	stageDist = stage->GetDist();
+	MazeCost = stage->GetMazeDataDijkstra();
+
+	CurrentRoute = {};
 	
 }
 
@@ -85,6 +88,7 @@ void Enemy::Update()
 	static bool stop = false;
 
 	EnemyGridPos = { (int)pos_.x / 32, (int)pos_.y / 32 };
+	PlayerGritPos = { player->GetGridPos() };
 
 	if (!stop) {
 		Point op = pos_;
@@ -127,11 +131,12 @@ void Enemy::Update()
 	int cy = (pos_.y / (CHA_HEIGHT))%2;
 	if (prgssx == 0 && prgssy == 0 && cx && cy)
 	{
-		DijkstraMove();
+		BFS({ EnemyGridPos.x , EnemyGridPos.y }, PlayerGritPos.x, PlayerGritPos.y);
+		
 	}
 
 	//Point tmp = player->GetGridPos();
-	//tmpRoute = stage->restore(tmp.x, tmp.y);//ゴールまでの道のりを保存
+	tmpRoute = stage->restore(PlayerGritPos.x ,PlayerGritPos.y);//ゴールまでの道のりを保存
 	//stageDist = stage->GetDist();//コストを保存
 }
 
@@ -153,10 +158,16 @@ void Enemy::Draw()
 		DrawBox(itr.x * CHA_WIDTH, itr.y * CHA_HEIGHT, itr.x * CHA_WIDTH + CHA_WIDTH, itr.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(255, 255, 0), FALSE);
 	}
 
+	for (auto itr : CurrentRoute)
+	{
+		DrawBox(itr.x * CHA_WIDTH, itr.y * CHA_HEIGHT, itr.x * CHA_WIDTH + CHA_WIDTH, itr.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(255, 230, 0), TRUE);
+	}
+
 	ImGui::Begin("config 1");
-	ImGui::Text("forward: %.1d", forward_);
-	//ImGui::Text("x: %.1d", EnemyGridPos.x);
-	//ImGui::Text("y: %.1d", EnemyGridPos.y);
+	//ImGui::Text("forward: %.1d", forward_);
+	ImGui::Text("fx: %.1d", fx);
+	ImGui::Text("fy: %.1d", fy);
+	
 	ImGui::End();
 }
 
@@ -270,63 +281,124 @@ void Enemy::DijkstraMove()
 
 }
 
-void Enemy::BFS(pair<int,int> start, Vec2 goal)
+void Enemy::BFS(pair<int, int> start, int endX, int endY)
 {
-	Stage* stage = (Stage*)FindGameObject<Stage>();
-
-	using Mdat = std::pair<int, Point>;
+	//dist[1(y)][1(x)]をコストを0で初期化
 	Edist[start.second][start.first] = 0;
-	std::queue<Mdat> q;
-	q.push(Mdat(0, { start.first, start.second }));
 
-	vector<vector<STAGE_OBJ>> stageData = ((Stage*)FindGameObject<Stage>())->GetStageGrid();
+	//Mdat型、Mdat型コンテナ、昇順
+	std::priority_queue<Mdat, std::vector<Mdat>, std::greater<Mdat>> pq;
 
-	while (!q.empty())
+	//コスト0,座標1,1で初期化
+	pq.push(Mdat(0, { start.first, start.second }));
+
+	//一ブロックをEMPTYで初期化
+	vector<vector<STAGE_OBJ>> stageData = vector(STAGE_HEIGHT, vector<STAGE_OBJ>(STAGE_WIDTH, STAGE_OBJ::EMPTY));;
+
+	while (!pq.empty())
 	{
-		Mdat p = q.front();
-		q.pop();
+		Mdat p = pq.top();
+		pq.pop();
 
+		//最短距離を保管
 		int cost = p.first;
-		Point v = p.second;
+
+		//現在値を保管
+		Vec2Int v = p.second;
 
 		for (int i = 0; i < 4; i++)
 		{
-			Vec2Int np = { v.x + (int)dirs[i].x, v.y + (int)dirs[i].y };
-			
+			//探索方向　dirs[0]~[3]から一個ずつ確認
+			//first : 探索先のx方向
+			//second : 探索先のy方向
+			Vec2Int np = { v.first + (int)dirs[i].x, v.second + (int)dirs[i].y };
 
+			//0かグリッドを超える探索はしない
 			if (np.first < 0 || np.second < 0 || np.first >= STAGE_WIDTH || np.second >= STAGE_HEIGHT) continue;
+
+			//壁なら探索しない
 			if (stageData[np.second][np.first] == STAGE_OBJ::WALL) continue;
 
-			//int newDist = c + stageData[np.y][np.x].weight;
+			//探索する方向よりコストが大きいならスルー
+			if (Edist[np.second][np.first] <= MazeCost[np.second][np.first].weight + cost) continue;
 
-			std::vector<std::vector<floorData>> sd = stage->GetMazeDataDijkstra();
-			if (Edist[np.second][np.first] <= sd[np.second][np.first].weight + cost) continue;
+			//最短距離を更新
+			Edist[np.second][np.first] = MazeCost[np.second][np.first].weight + cost;
 
-			Edist[np.second][np.first] = sd[np.second][np.first].weight + cost;
-			Eprev[np.second][np.first] = Vec2{ (double)v.x, (double)v.y };
-			q.push(Mdat(Edist[np.second][np.first], np));
-			}
+			//辿った経路を保存
+			Eprev[np.second][np.first] = Vec2{ (double)v.first, (double)v.second };
+
+			//今のコストと探索方向の座標を保存
+			pq.push(Mdat(Edist[np.second][np.first], np));
 		}
 	}
-	// 最短経路復元（次に移動すべき方向を決定）
-	Vec2 current = ; // ゴール地点から始める
-	while (Eprev[current.y][current.x] != sp) {
-		current = Eprev[current.y][current.x];
-	}
 
-	// currentが最短経路上の最初の一歩。現在の敵の位置と比較して次に移動するべき方向を決定
-	if (current.x > sp.x) {
-		forward_ = RIGHT;
+	//Enemyの位置からプレイヤーの位置までの座標
+	std::vector<Vec2> path;
+
+	//開始位置をvec2に保管
+	Vec2 sVec = { start.first,  start.second };
+	Stage* stage = (Stage*)FindGameObject<Stage>();
+	path = stage->restore(endX,endY);
+	cp = path;
+	//CurrentRoute = path;
+
+	if (path.empty() || index_path > path.size())
+		forward_ = NONE;
+
+	int findX = path[index_path + 1].x - path[index_path + 0].x;
+	int findY = path[index_path + 1].y - path[index_path + 0].y;
+	fx = findX;
+	fy = findY;
+	Vec2 FindPos = { findX,findY };
+	CurrentRoute.push_back(path[index_path]);
+	index_path++;
+	/*int index = -1;
+	for (int i = 0; i < path.size(); i++)
+	{
+		if (path[i].x == start.first && path[i].y == start.second)
+		{
+			index = i;
+			CurrentRoute.push_back(path[i]);
+			break;
+		}
+		else
+		{
+			index = i;
+		}
 	}
-	else if (current.x < sp.x) {
-		forward_ = LEFT;
-	}
-	else if (current.y > sp.y) {
-		forward_ = DOWN;
-	}
-	else if (current.y < sp.y) {
+	if (index >= path.size() - 1)
+		forward_ = NONE;
+
+	int findX = path[index + 1].x - path[index].x;
+	int findY = path[index + 1].y - path[index].y;
+	Vec2 FindPos = { findX,findY };*/
+
+	if (FindPos == Vec2{0, -1})
+	{
 		forward_ = UP;
 	}
+	else if (FindPos == Vec2{0, 1})
+	{
+		forward_ = DOWN;
+	}
+	else if (FindPos == Vec2{-1, 0})
+	{
+		forward_ = LEFT;
+	}
+	else if (FindPos == Vec2{1, 0})
+	{
+		forward_ = RIGHT;
+	}
+	else
+		forward_ = NONE;
+	/*int i = 0;
+	while (path[i] != endVec)
+	{
+		if(path[i])
+		i++;
+	}*/
+	
 }
 
 bool Enemy::CheckHit(const Rect& me, const Rect& other)

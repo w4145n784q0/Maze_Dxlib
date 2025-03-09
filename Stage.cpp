@@ -251,18 +251,14 @@ void Stage::Draw()
 	{
 		DrawBox(itr.x * CHA_WIDTH, itr.y * CHA_HEIGHT, itr.x * CHA_WIDTH + CHA_WIDTH, itr.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(255, 255, 0), FALSE);
 	}*/
-	for (auto itr : route_)
-	{
-		DrawBox(itr.x * CHA_WIDTH, itr.y * CHA_HEIGHT, itr.x * CHA_WIDTH + CHA_WIDTH, itr.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(255, 220, 0), TRUE);
-	}
 
-	ImGui::Begin("config 1");
-	ImGui::Text("x: %.1d", sx);
-	ImGui::Text("y: %.1d", sy);
+	//ImGui::Begin("config 1");
+	//ImGui::Text("x: %.1d", sx);
+	//ImGui::Text("y: %.1d", sy);
 
 	//ImGui::Text("nextx: %.1d", sx2);
 	//ImGui::Text("nexty: %.1d", sy2);
-	ImGui::End();
+	//ImGui::End();
 }
 
 void Stage::setStageRects()
@@ -425,5 +421,5 @@ std::vector<std::vector<int>> Stage::GetDist()
 
 std::vector<std::vector<floorData>> Stage::GetMazeDataDijkstra()
 {
-	return std::vector<std::vector<floorData>>();
+	return MazeDataDijkstra;
 }

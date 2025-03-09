@@ -25,6 +25,11 @@ private:
     std::vector<Vec2> tmpRoute;
     std::vector<std::vector<int>> stageDist;
     Point EnemyGridPos;
+    Point PlayerGritPos;
+    std::vector<Vec2> CurrentRoute;
+    int index_path = 0;
+    std::vector<Vec2> cp;
+    int fx, fy;
 public:
     Enemy();
     ~Enemy();
@@ -63,7 +68,7 @@ public:
     /// </summary>
     void DijkstraMove();
 
-    void BFS(pair<int, int> start,Vec2 goal);
+    void BFS(std:: pair<int, int> start, int endX, int endY);
 
     //void DijkstraMove2();
 
