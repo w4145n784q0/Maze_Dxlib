@@ -21,7 +21,7 @@ namespace {
 Player::Player()
 	: pos_({ CHA_WIDTH , CHA_HEIGHT }), playerImage_(-1),GridPos_(GetGridPos())
 {
-	
+
 }
 
 Player::~Player()
@@ -52,7 +52,7 @@ void Player::Update()
 		pos_.x++;
 		inputDir = RIGHT;
 	}
-	
+
 
 	Stage* stage = (Stage*)FindGameObject<Stage>();
 	Rect playerRect = { pos_.x, pos_.y, CHA_WIDTH, CHA_HEIGHT };
@@ -110,8 +110,8 @@ void Player::Update()
 void Player::Draw()
 {
 	//ImGui::Begin("config 1");
-	ImGui::Text("Pos.x %.1d", GridPos_.x);
-	ImGui::Text("Pos.y %.1d", GridPos_.y);
+	//ImGui::Text("Pos.x %.1d", GridPos_.x);
+	//ImGui::Text("Pos.y %.1d", GridPos_.y);
 	//ImGui::End();
 
 	DrawBox(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, GetColor(255, 10, 10), TRUE);

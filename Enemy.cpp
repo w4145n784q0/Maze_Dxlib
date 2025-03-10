@@ -27,7 +27,7 @@ namespace
 }
 
 Enemy::Enemy()
-	:pos_({ 0,0 }), isAlive_(true), nextPos_({ 0,0 }),RandTimer_(0),ChoiceMove(XYCLOSEMOVE)
+	:pos_({ 0,0 }), isAlive_(true), nextPos_({ 0,0 }), RandTimer_(0), ChoiceMove(XYCLOSEMOVE)
 {
 	int rx = 0;
 	int ry = 0;
@@ -68,13 +68,10 @@ Enemy::Enemy()
 
 	EnemyGridPos = { pos_.x / 32, pos_.y / 32 };
 	Point tmp = player->GetGridPos();
-	stage->Dijkstra({EnemyGridPos.x, EnemyGridPos.y });
+	stage->Dijkstra({ EnemyGridPos.x, EnemyGridPos.y });
 	tmpRoute = stage->restore(tmp.x, tmp.y);//ルートを保存
 	stageDist = stage->GetDist();
 	MazeCost = stage->GetMazeDataDijkstra();
-
-	CurrentRoute = {};
-	
 }
 
 Enemy::~Enemy()
@@ -96,11 +93,11 @@ void Enemy::Update()
 		Rect eRect = { pos_.x, pos_.y,CHA_WIDTH, CHA_HEIGHT };//敵の位置（Rect型）
 
 
-		//if (Input::IsKeepKeyDown(KEY_INPUT_SPACE))
-		//{
-		//	move = { 0,0 };
-		//}
-		
+		if (Input::IsKeepKeyDown(KEY_INPUT_SPACE))
+		{
+			move = { 0,0 };
+		}
+
 		pos_ = { pos_.x + move.x, pos_.y + move.y };
 		for (auto& obj : stage->GetStageRects())
 		{
@@ -125,7 +122,7 @@ void Enemy::Update()
 			}
 		}
 	}
-	
+
 	int prgssx = pos_.x % (CHA_WIDTH);
 	int prgssy = pos_.y % (CHA_HEIGHT);
 
@@ -134,26 +131,23 @@ void Enemy::Update()
 	if (prgssx == 0 && prgssy == 0 /*&& cx && cy*/)
 	{
 		BFS({ EnemyGridPos.x , EnemyGridPos.y }, PlayerGritPos.x, PlayerGritPos.y);
-
 	}
-	//BFS({ EnemyGridPos.x , EnemyGridPos.y }, PlayerGritPos.x, PlayerGritPos.y);
-	//Point tmp = player->GetGridPos();
-	tmpRoute = stage->restore(PlayerGritPos.x ,PlayerGritPos.y);//ゴールまでの道のりを保存
+	tmpRoute = stage->restore(PlayerGritPos.x, PlayerGritPos.y);//ゴールまでの道のりを保存
 	//stageDist = stage->GetDist();//コストを保存
 }
 
 void Enemy::Draw()
 {
-	DrawBox(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, 
+	DrawBox(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT,
 		GetColor(80, 89, 10), TRUE);
 	Point tp[4][3] = {
 		{{pos_.x + CHA_WIDTH / 2, pos_.y}, {pos_.x, pos_.y + CHA_HEIGHT / 2}, {pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT / 2}},
 		{{pos_.x + CHA_WIDTH / 2, pos_.y + CHA_HEIGHT}, {pos_.x, pos_.y + CHA_HEIGHT / 2}, {pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT / 2}},
-		{{pos_.x            , pos_.y + CHA_HEIGHT / 2}, {pos_.x + CHA_WIDTH / 2, pos_.y}, {pos_.x + CHA_WIDTH/2, pos_.y  + CHA_HEIGHT}},
-		{{pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT / 2}, {pos_.x + CHA_WIDTH / 2, pos_.y}, {pos_.x + CHA_WIDTH/2, pos_.y + CHA_HEIGHT}}
-					};
+		{{pos_.x            , pos_.y + CHA_HEIGHT / 2}, {pos_.x + CHA_WIDTH / 2, pos_.y}, {pos_.x + CHA_WIDTH / 2, pos_.y + CHA_HEIGHT}},
+		{{pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT / 2}, {pos_.x + CHA_WIDTH / 2, pos_.y}, {pos_.x + CHA_WIDTH / 2, pos_.y + CHA_HEIGHT}}
+	};
 
-	DrawTriangle(tp[forward_][0].x, tp[forward_][0].y, tp[forward_][1].x, tp[forward_][1].y, tp[forward_][2].x, tp[forward_][2].y, GetColor(255,255,255), TRUE);
+	DrawTriangle(tp[forward_][0].x, tp[forward_][0].y, tp[forward_][1].x, tp[forward_][1].y, tp[forward_][2].x, tp[forward_][2].y, GetColor(255, 255, 255), TRUE);
 
 	/*for (auto itr : tmpRoute)
 	{
@@ -173,16 +167,17 @@ void Enemy::Draw()
 				std::string s = std::to_string(Edist[y][x]);
 				const char* c = s.c_str();
 				//ゴールまでのコストを表示
-				DrawFormatString(x * CHA_WIDTH, y * CHA_HEIGHT,GetColor(0,0,255), "%s", c);
+				DrawFormatString(x * CHA_WIDTH, y * CHA_HEIGHT, GetColor(0, 0, 255), "%s", c);
 			}
 		}
 	}
 
 	ImGui::Begin("config 1");
-	ImGui::Text("forward: %.1d", forward_);
-	ImGui::Text("fx: %.1d,fy: %.1d", fx,fy);
-	ImGui::Text("cx: %.1d,cy: %.1d", cx, cy);
-	
+	//ImGui::Text("forward: %.1d", forward_);
+	//ImGui::Text("Index_path: %.1d", index_path);
+	//ImGui::Text("fx: %.1d,fy: %.1d", fx,fy);
+	//ImGui::Text("cx: %.1d,cy: %.1d", cx, cy);
+
 	ImGui::End();
 }
 
@@ -288,17 +283,11 @@ void Enemy::RightHandMove()
 
 void Enemy::DijkstraMove()
 {
-	//Stage* stage = (Stage*)FindGameObject<Stage>();
-	//Player* player = (Player*)FindGameObject<Player>();
-	//forward_ = stage->DijkstraRoute({ EnemyGridPos.x , EnemyGridPos.y }, player->GetGridPos().x, player->GetGridPos().y);
-	//forward_ = stage->DijkstraQueue({ EnemyGridPos.x , EnemyGridPos.y }, player->GetGridPos().x, player->GetGridPos().y);
-
-
+	BFS({ EnemyGridPos.x , EnemyGridPos.y }, PlayerGritPos.x, PlayerGritPos.y);
 }
 
 void Enemy::BFS(pair<int, int> start, int endX, int endY)
 {
-
 	EnemyDijkstra(start);
 	std::vector<Vec2> path = EnemyRestore(endX, endY);
 	cp = path;
@@ -307,36 +296,43 @@ void Enemy::BFS(pair<int, int> start, int endX, int endY)
 		forward_ = NONE;
 		return;
 	}
-	// 現在の位置 (path[0]) と次の位置 (path[1]) を取得
-	Vec2 currentPosition = path[0];
-	Vec2 nextPosition = path[1];
+	if (index_path >= path.size() - 1)
+	{
+		forward_ = NONE;
+		return;
+	}
+
+	// 現在の位置と次の位置を取得
+	Vec2 currentPosition = path[index_path];
+	Vec2 nextPosition = path[index_path + 1];
 	fx = (int)currentPosition.x;
 	fy = (int)currentPosition.y;
 	cx = (int)nextPosition.x;
 	cy = (int)nextPosition.y;
 
 	// 次の位置に進む方向を判定
-	int dx = nextPosition.x - currentPosition.x;
-	int dy = nextPosition.y - currentPosition.y;
+	int nextX = nextPosition.x - currentPosition.x;
+	int nextY = nextPosition.y - currentPosition.y;
 
 
 	// 各方向に対して、dx, dy の値に基づいて進む方向を決定
-	if (dx == 1 && dy == 0) {
-		forward_ = RIGHT; // 右に進む
+	if (nextX == 1 && nextY == 0) {
+		forward_ = RIGHT;
 	}
-	else if (dx == -1 && dy == 0) {
-		forward_ = LEFT; // 左に進む
+	else if (nextX == -1 && nextY == 0) {
+		forward_ = LEFT;
 	}
-	else if (dx == 0 && dy == 1) {
-		forward_ = DOWN; // 下に進む
+	else if (nextX == 0 && nextY == 1) {
+		forward_ = DOWN;
 	}
-	else if (dx == 0 && dy == -1) {
-		forward_ = UP; // 上に進む
+	else if (nextX == 0 && nextY == -1) {
+		forward_ = UP;
 	}
 	else {
-		forward_ = NONE; // 進む方向がわからない場合
+		forward_ = NONE;
 	}
 	path.erase(path.begin()); // path[0]を削除して次の座標を先頭に持ってくる
+	index_path++;
 }
 
 void Enemy::EnemyDijkstra(std::pair<int, int> start)
@@ -374,7 +370,7 @@ void Enemy::EnemyDijkstra(std::pair<int, int> start)
 			if (np.first < 0 || np.second < 0 || np.first >= STAGE_WIDTH || np.second >= STAGE_HEIGHT) continue;
 
 			//壁なら探索しない
-			if ( stage->GetStageDataXY(np.first, np.second) == STAGE_OBJ::WALL) continue;
+			if (stage->GetStageDataXY(np.first, np.second) == STAGE_OBJ::WALL) continue;
 
 			//探索する方向よりコストが大きいならスルー
 			if (Edist[np.second][np.first] <= MazeCost[np.second][np.first].weight + cost) continue;

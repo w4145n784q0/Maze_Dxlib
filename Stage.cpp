@@ -11,7 +11,7 @@ using std::vector;
 namespace {
 	std::stack<Point> prStack;
 
-	
+
 	//二次元配列　MazeData[MazeSize.y][MazeSize.x]{FLOORで初期化｝
 	std::vector<std::vector<floorData>> MazeDataDijkstra(STAGE_HEIGHT, std::vector<floorData>(STAGE_WIDTH, { STAGE_OBJ::EMPTY, 0 })); //迷路そのもの
 
@@ -19,15 +19,15 @@ namespace {
 	//distの要素数は[0]~[20](21個),それぞれが39個のINT_MAXを持つ
 	//ダイクストラ法は始めに各値を無限大(INT_MAX)で初期化
 	std::vector<std::vector<int>> dist(STAGE_HEIGHT, std::vector<int>(STAGE_WIDTH, INT_MAX));
-	
+
 	//経路保存用
 	//prevの要素数21個,それぞれが39個の{-1,-1}を持つ
-	std::vector<std::vector<Vec2>> prev(STAGE_HEIGHT, std::vector<Vec2>(STAGE_WIDTH, { -1, -1 })); 
+	std::vector<std::vector<Vec2>> prev(STAGE_HEIGHT, std::vector<Vec2>(STAGE_WIDTH, { -1, -1 }));
 
-	void DigDug(int x, int y, vector<vector<STAGE_OBJ>> &_stage)
+	void DigDug(int x, int y, vector<vector<STAGE_OBJ>>& _stage)
 	{
 		_stage[y][x] = STAGE_OBJ::EMPTY;
-		
+
 		Point Dir[]{ {0,-1},{1, 0},{0, 1},{-1,0} };
 
 		//壁（穴掘り予定）のリスト
@@ -181,30 +181,35 @@ Stage::Stage()
 	//MakeMazePushDownBar(STAGE_WIDTH, STAGE_HEIGHT, stageData);
 
 	//グリッド
-	/*for (int y = 0; y < STAGE_HEIGHT; y++)
-	{
-		for (int x = 0; x < STAGE_WIDTH; x++)
-		{
-			if (y == 0 || y == STAGE_HEIGHT - 1 || x == 0 || x == STAGE_WIDTH - 1)
-			{
-				stageData[y][x] = STAGE_OBJ::WALL;
-			}
-			else
-			{
-				if (x % 2 == 0 && y % 2 == 0)
-					stageData[y][x] = STAGE_OBJ::WALL;
-				else
-					stageData[y][x] = STAGE_OBJ::EMPTY;
-			}
+	//for (int y = 0; y < STAGE_HEIGHT; y++)
+	//{
+	//	for (int x = 0; x < STAGE_WIDTH; x++)
+	//	{
+	//		if (y == 0 || y == STAGE_HEIGHT - 1 || x == 0 || x == STAGE_WIDTH - 1)
+	//		{
+	//			stageData[y][x] = STAGE_OBJ::WALL;
+	//		}
+	//		else
+	//		{
+	//			if (x % 2 == 0 && y % 2 == 0)
+	//			{
+	//				stageData[y][x] = STAGE_OBJ::WALL;
+	//			}
+	//			else
+	//			{
+	//				stageData[y][x] = STAGE_OBJ::EMPTY;
+	//				MazeDataDijkstra[y][x].weight = (rand() % 5) + 1;
+	//				//MazeDataDijkstra[y][x].weight = 1;
+	//			}
+	//		}
 
-		}
-	}*/
+	//	}
+	//}
 	setStageRects();
 
-	std::vector<std::vector<int>> a;
 	//Dijkstra({ 1,1 });
 
-    //route = restore(GOAL_POINT.x, GOAL_POINT.y );//経路を逆追跡
+	//route = restore(GOAL_POINT.x, GOAL_POINT.y );//経路を逆追跡
 
 }
 
@@ -237,13 +242,37 @@ void Stage::Draw()
 			default:
 				break;
 			}
-			if (dist[y][x] < INT_MAX)
-			{
+
+			//switch (MazeDataDijkstra[y][x].weight)
+			//{
+			//case 1://デフォルト
+			//	DrawBox(x * CHA_WIDTH, y * CHA_HEIGHT, x * CHA_WIDTH + CHA_WIDTH, y * CHA_HEIGHT + CHA_HEIGHT, GetColor(102, 205, 170), TRUE);
+			//	break;
+			//case 2://lightgreen
+			//	DrawBox(x * CHA_WIDTH, y * CHA_HEIGHT, x * CHA_WIDTH + CHA_WIDTH, y * CHA_HEIGHT + CHA_HEIGHT, GetColor(144, 238, 144), TRUE);
+			//	break;
+			//case 3://lime
+			//	DrawBox(x * CHA_WIDTH, y * CHA_HEIGHT, x * CHA_WIDTH + CHA_WIDTH, y * CHA_HEIGHT + CHA_HEIGHT, GetColor(0, 255, 0), TRUE);
+			//	break;
+			//case 4://darkolivegreen
+			//	DrawBox(x * CHA_WIDTH, y * CHA_HEIGHT, x * CHA_WIDTH + CHA_WIDTH, y * CHA_HEIGHT + CHA_HEIGHT, GetColor(85, 107, 47), TRUE);
+			//	break;
+			//case 5://purple
+			//	DrawBox(x * CHA_WIDTH, y * CHA_HEIGHT, x * CHA_WIDTH + CHA_WIDTH, y * CHA_HEIGHT + CHA_HEIGHT, GetColor(128, 0, 128), TRUE);
+			//	break;
+			//default:
+
+			//	break;
+			//}
+
+
+			//if (dist[y][x] < INT_MAX)
+			//{
 				//std::string s = std::to_string(dist[y][x]);
 				//const char* c = s.c_str();
 				//ゴールまでのコストを表示
 				//DrawFormatString(x * CHA_WIDTH, y * CHA_HEIGHT,GetColor(0,0,255), "%s", c);
-			}
+			//}
 		}
 	}
 
@@ -269,7 +298,7 @@ void Stage::setStageRects()
 		{
 			if (stageData[y][x] == STAGE_OBJ::WALL)
 			{
-				stageRects.push_back(Rect(x * CHA_WIDTH, y * CHA_HEIGHT,  CHA_WIDTH, CHA_HEIGHT));
+				stageRects.push_back(Rect(x * CHA_WIDTH, y * CHA_HEIGHT, CHA_WIDTH, CHA_HEIGHT));
 			}
 		}
 	}
@@ -293,7 +322,7 @@ void Stage::Dijkstra(pair<int, int> sp)
 		pq.pop();
 
 		//Rect{ (int)p.second.first * CHA_WIDTH, (int)p.second.second * CHA_HEIGHT, BLOCK_SIZE }.draw(Palette::Red);
-		
+
 		//最短距離を保管
 		int cost = p.first;
 
@@ -320,7 +349,7 @@ void Stage::Dijkstra(pair<int, int> sp)
 			dist[np.second][np.first] = MazeDataDijkstra[np.second][np.first].weight + cost;
 
 			//辿った経路を保存
-			prev[np.second][np.first] = Vec2{(double)v.first, (double)v.second };
+			prev[np.second][np.first] = Vec2{ (double)v.first, (double)v.second };
 
 			//今のコストと探索方向の座標を保存
 			pq.push(Mdat(dist[np.second][np.first], np));
@@ -346,24 +375,24 @@ std::vector<Vec2> Stage::restore(int _x, int _y)
 	return path;
 }
 
-DIR Stage::DijkstraRoute(pair<int, int> sp, int endX,int endY)
+DIR Stage::DijkstraRoute(pair<int, int> sp, int endX, int endY)
 {
 	Dijkstra(sp);
 	std::vector path = restore(endX, endY);
-	
+
 	if (path.empty())
 		return DIR::NONE;
 
 	int index = -1;
 	for (int i = 0; i < path.size(); i++)
 	{
-		if (path[i].x == sp.first && path[i].y == sp.second) 
+		if (path[i].x == sp.first && path[i].y == sp.second)
 		{
 			index = i;
 			break;
 		}
 	}
-	if(index >= path.size() - 1)
+	if (index >= path.size() - 1)
 		return DIR::NONE;
 
 	int findX = path[index + 1].x - path[index].x;
@@ -384,7 +413,7 @@ DIR Stage::DijkstraRoute(pair<int, int> sp, int endX,int endY)
 			return dirs[i];
 		}
 	}
-	
+
 	return DIR::NONE;
 }
 

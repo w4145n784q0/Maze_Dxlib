@@ -42,7 +42,7 @@ struct floorData
 };
 
 class Stage :
-    public GameObject
+	public GameObject
 {
 	vector<vector<STAGE_OBJ>> stageData;
 	vector<Rect> stageRects;
@@ -56,7 +56,7 @@ public:
 	~Stage();
 	void Update() override;
 	void Draw() override;
-	STAGE_OBJ GetStageDataXY(int x, int y) {return stageData[y][x];}
+	STAGE_OBJ GetStageDataXY(int x, int y) { return stageData[y][x]; }
 	vector<Rect> GetStageRects() { return stageRects; }
 	vector<vector<STAGE_OBJ>>& GetStageGrid() { return stageData; }
 	void setStageRects();
@@ -90,5 +90,5 @@ public:
 	vector<vector<STAGE_OBJ>> GetstageData() { return stageData; }
 	std::vector<std::vector<floorData>> GetMazeDataDijkstra();
 
-	
+
 };
