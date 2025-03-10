@@ -130,7 +130,8 @@ void Enemy::Update()
 	//int cy = (pos_.y / (CHA_HEIGHT))%2;
 	if (prgssx == 0 && prgssy == 0 /*&& cx && cy*/)
 	{
-		BFS({ EnemyGridPos.x , EnemyGridPos.y }, PlayerGritPos.x, PlayerGritPos.y);
+		//BFS({ EnemyGridPos.x , EnemyGridPos.y }, PlayerGritPos.x, PlayerGritPos.y);
+		DijkstraMove();
 	}
 	tmpRoute = stage->restore(PlayerGritPos.x, PlayerGritPos.y);//ゴールまでの道のりを保存
 	//stageDist = stage->GetDist();//コストを保存
@@ -156,7 +157,7 @@ void Enemy::Draw()
 
 	for (auto itr : cp)
 	{
-		DrawBox(itr.x * CHA_WIDTH, itr.y * CHA_HEIGHT, itr.x * CHA_WIDTH + CHA_WIDTH, itr.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(255, 230, 0), FALSE);
+		DrawBox(itr.x * CHA_WIDTH, itr.y * CHA_HEIGHT, itr.x * CHA_WIDTH + CHA_WIDTH, itr.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(255, 0, 0), FALSE);
 	}
 	for (int y = 0; y < STAGE_HEIGHT; y++)
 	{

@@ -177,34 +177,34 @@ Stage::Stage()
 {
 	stageData = vector(STAGE_HEIGHT, vector<STAGE_OBJ>(STAGE_WIDTH, STAGE_OBJ::EMPTY));
 
-	MakeMazeDigDug(STAGE_WIDTH, STAGE_HEIGHT, stageData);
+	//MakeMazeDigDug(STAGE_WIDTH, STAGE_HEIGHT, stageData);
 	//MakeMazePushDownBar(STAGE_WIDTH, STAGE_HEIGHT, stageData);
 
 	//グリッド
-	//for (int y = 0; y < STAGE_HEIGHT; y++)
-	//{
-	//	for (int x = 0; x < STAGE_WIDTH; x++)
-	//	{
-	//		if (y == 0 || y == STAGE_HEIGHT - 1 || x == 0 || x == STAGE_WIDTH - 1)
-	//		{
-	//			stageData[y][x] = STAGE_OBJ::WALL;
-	//		}
-	//		else
-	//		{
-	//			if (x % 2 == 0 && y % 2 == 0)
-	//			{
-	//				stageData[y][x] = STAGE_OBJ::WALL;
-	//			}
-	//			else
-	//			{
-	//				stageData[y][x] = STAGE_OBJ::EMPTY;
-	//				MazeDataDijkstra[y][x].weight = (rand() % 5) + 1;
-	//				//MazeDataDijkstra[y][x].weight = 1;
-	//			}
-	//		}
+	for (int y = 0; y < STAGE_HEIGHT; y++)
+	{
+		for (int x = 0; x < STAGE_WIDTH; x++)
+		{
+			if (y == 0 || y == STAGE_HEIGHT - 1 || x == 0 || x == STAGE_WIDTH - 1)
+			{
+				stageData[y][x] = STAGE_OBJ::WALL;
+			}
+			else
+			{
+				if (x % 2 == 0 && y % 2 == 0)
+				{
+					stageData[y][x] = STAGE_OBJ::WALL;
+				}
+				else
+				{
+					stageData[y][x] = STAGE_OBJ::EMPTY;
+					MazeDataDijkstra[y][x].weight = (rand() % 5) + 1;
+					//MazeDataDijkstra[y][x].weight = 1;
+				}
+			}
 
-	//	}
-	//}
+		}
+	}
 	setStageRects();
 
 	//Dijkstra({ 1,1 });
@@ -243,27 +243,26 @@ void Stage::Draw()
 				break;
 			}
 
-			//switch (MazeDataDijkstra[y][x].weight)
-			//{
-			//case 1://デフォルト
-			//	DrawBox(x * CHA_WIDTH, y * CHA_HEIGHT, x * CHA_WIDTH + CHA_WIDTH, y * CHA_HEIGHT + CHA_HEIGHT, GetColor(102, 205, 170), TRUE);
-			//	break;
-			//case 2://lightgreen
-			//	DrawBox(x * CHA_WIDTH, y * CHA_HEIGHT, x * CHA_WIDTH + CHA_WIDTH, y * CHA_HEIGHT + CHA_HEIGHT, GetColor(144, 238, 144), TRUE);
-			//	break;
-			//case 3://lime
-			//	DrawBox(x * CHA_WIDTH, y * CHA_HEIGHT, x * CHA_WIDTH + CHA_WIDTH, y * CHA_HEIGHT + CHA_HEIGHT, GetColor(0, 255, 0), TRUE);
-			//	break;
-			//case 4://darkolivegreen
-			//	DrawBox(x * CHA_WIDTH, y * CHA_HEIGHT, x * CHA_WIDTH + CHA_WIDTH, y * CHA_HEIGHT + CHA_HEIGHT, GetColor(85, 107, 47), TRUE);
-			//	break;
-			//case 5://purple
-			//	DrawBox(x * CHA_WIDTH, y * CHA_HEIGHT, x * CHA_WIDTH + CHA_WIDTH, y * CHA_HEIGHT + CHA_HEIGHT, GetColor(128, 0, 128), TRUE);
-			//	break;
-			//default:
-
-			//	break;
-			//}
+			switch (MazeDataDijkstra[y][x].weight)
+			{
+			case 1://デフォルト
+				DrawBox(x * CHA_WIDTH, y * CHA_HEIGHT, x * CHA_WIDTH + CHA_WIDTH, y * CHA_HEIGHT + CHA_HEIGHT, GetColor(102, 205, 170), TRUE);
+				break;
+			case 2://lightgreen
+				DrawBox(x * CHA_WIDTH, y * CHA_HEIGHT, x * CHA_WIDTH + CHA_WIDTH, y * CHA_HEIGHT + CHA_HEIGHT, GetColor(144, 238, 144), TRUE);
+				break;
+			case 3://lime
+				DrawBox(x * CHA_WIDTH, y * CHA_HEIGHT, x * CHA_WIDTH + CHA_WIDTH, y * CHA_HEIGHT + CHA_HEIGHT, GetColor(0, 255, 0), TRUE);
+				break;
+			case 4://darkolivegreen
+				DrawBox(x * CHA_WIDTH, y * CHA_HEIGHT, x * CHA_WIDTH + CHA_WIDTH, y * CHA_HEIGHT + CHA_HEIGHT, GetColor(85, 107, 47), TRUE);
+				break;
+			case 5://purple
+				DrawBox(x * CHA_WIDTH, y * CHA_HEIGHT, x * CHA_WIDTH + CHA_WIDTH, y * CHA_HEIGHT + CHA_HEIGHT, GetColor(128, 0, 128), TRUE);
+				break;
+			default:
+				break;
+			}
 
 
 			//if (dist[y][x] < INT_MAX)
